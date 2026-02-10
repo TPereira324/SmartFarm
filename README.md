@@ -26,7 +26,7 @@ Toda a documentação detalhada encontra-se na pasta **documentação**, incluin
 ## Tecnologias
 
 - **Frontend:** HTML, CSS, JavaScript  
-- **Backend:** Node.js (PHP)  
+- **Backend:** Node.js 
 - **Base de Dados:** MySQL  
 - **Design:** Figma  
 - **Documentação da API:** Swagger  
