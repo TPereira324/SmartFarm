@@ -1,4 +1,4 @@
-# Smartcamp
+# Smartfarm
 
 Este repositório contém o projeto **SmartCamp**, desenvolvido no âmbito da Unidade Curricular de **Projeto** da Universidade Europeia / IADE.
 
