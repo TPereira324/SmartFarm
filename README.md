@@ -1,6 +1,6 @@
-# SmartFarm
+# FarmSIG
 
-Este repositório contém o projeto **SmartFarm**, desenvolvido no âmbito da Unidade Curricular de **Projeto** da Universidade Europeia / IADE.
+Este repositório contém o projeto **FarmSIG**, desenvolvido no âmbito da Unidade Curricular de **Projeto** da Universidade Europeia / IADE.
 
 O projeto consiste numa aplicação web focada em **agricultura inteligente**, permitindo ao agricultor monitorizar dados climáticos, controlar a alimentação dos animais e visualizar informações essenciais através de dashboards intuitivos. O objetivo é promover eficiência, sustentabilidade e inovação tecnológica no setor agrícola.
 
