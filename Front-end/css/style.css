@@ -1,0 +1,118 @@
+/* Design Styles for CocoRoot */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.welcome-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo-section {
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.brand-name {
+    font-size: 2.5rem;
+    color: #3e5c32;
+    margin: 0.5rem 0;
+}
+
+.slogan {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 3rem;
+    text-align: left;
+}
+
+.features-list li {
+    margin-bottom: 0.8rem;
+    color: #666;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.features-list li::before {
+    content: "●";
+    color: #3e5c32;
+    position: absolute;
+    left: 0;
+}
+
+.btn-primary {
+    background-color: #3e5c32;
+    color: white;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #2d4525;
+}
+
+.btn-secondary {
+    background-color: #e0e0e0;
+    color: #666;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #d0d0d0;
+}
+
+/* Form Styles */
+.input-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.login-container h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.login-container .btn-primary {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.login-container .btn-secondary {
+    width: 100%;
+}

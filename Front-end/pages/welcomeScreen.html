@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CocoRoot - Bem-vindo</title>
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/style.css">
+    <title>Welcome - CocoRoot</title>
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <div id="app">
+    <div id="app" class="welcome-page">
         <div class="welcome-container">
             <div class="welcome-image">
                 <img src="https://images.unsplash.com/photo-1596701062351-df5f8a42f3c7?q=80&w=1000&auto=format&fit=crop" alt="Coconuts">
@@ -36,17 +36,11 @@
                 </ul>
 
                 <div class="button-group">
-                    <button class="btn-primary" onclick="location.href='pages/login.html'">Entrar</button>
+                    <button class="btn-primary" onclick="location.href='login.html'">Entrar</button>
                     <button class="btn-secondary">Registar-me</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script src="js/models/utilizadorModel.js"></script>
-    <script src="js/views/utilizadorView.js"></script>
-    <script src="js/controllers/utilizadorController.js"></script>
-    <script src="js/load.js"></script>
 </body>
 </html>
