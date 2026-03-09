@@ -1,11 +1,22 @@
 <?php
 
-require_once 'models/Model.php';
-require_once 'views/View.php';
-require_once 'controllers/Controller.php';
+require_once __DIR__ . '/conexao.php';
 
-$model = new Model();
-$view = new View();
-$controller = new Controller($model, $view);
 
-$controller->handleRequest();
+
+
+$query = "SELECT 1 AS test_value";
+$result = $mysqli->query($query);
+
+if ($result) {
+    $row = $result->fetch_assoc();
+    echo "✅ Consulta de teste bem-sucedida. A base de dados retornou: " . $row['test_value'] . "";
+} else {
+    
+    $result = $mysqli->query("SELECT 1 AS teste");
+    if ($result) {
+        $row = $result->fetch_assoc();
+        echo " - base conectada (teste: " . $row['teste'] . ")";
+    }
+}
+
