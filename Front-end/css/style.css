@@ -10,7 +10,7 @@ body {
 }
 
 .logo-section {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -18,22 +18,22 @@ body {
 }
 
 .logo-icon {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .logo-icon img {
-    width: 140px;
-    height: 140px;
+    width: 100px;
+    height: 100px;
     object-fit: contain;
 }
 
 .brand-name {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: #3e5c32;
-    margin: 0.5rem 0;
+    margin: 0.2rem 0;
     font-weight: 700;
 }
 
@@ -137,11 +137,11 @@ body {
 .login-form {
     width: 100%;
     max-width: 380px;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
 
 .input-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     text-align: left;
 }
 
