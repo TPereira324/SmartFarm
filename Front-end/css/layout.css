@@ -30,13 +30,15 @@ body {
 
 .welcome-content {
     width: 50%;
-    padding: 4rem;
+    padding: 2rem 4rem;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
     background-color: white;
+    overflow-y: auto;
+    height: 100vh;
 }
 
 .button-group {
