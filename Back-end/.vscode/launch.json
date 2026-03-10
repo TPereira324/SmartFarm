@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Iniciar Servidor PHP (MAMP)",
+            "type": "php",
+            "request": "launch",
+            "program": "${workspaceRoot}/index.php",
+            "cwd": "${workspaceRoot}",
+            "port": 8000,
+            "runtimeExecutable": "C:\\MAMP\\bin\\php\\php8.3.1\\php.exe",
+            "runtimeArgs": [
+                "-S",
+                "localhost:8000"
+            ]
+        }
+    ]
+}
