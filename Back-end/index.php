@@ -112,5 +112,4 @@ if (!method_exists($controller, $action)) {
 
 // Executa a ação, passando o ID se necessário
 $controller->$action($id);
-
 ?>
