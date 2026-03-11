@@ -15,7 +15,7 @@ include("conexao.php");
 		<input name="busca" value="<?php echo isset($_GET['busca']) ? $_GET['busca'] : ''; ?>" placeholder="Digite o nome do usuário" type="text" >
 		<button type="submit">Pesquisar</button>
 	</form>
-	<form action="register.php" method="POST">
+	<form action="registrar.php" method="POST">
 		<input type="text" name="nome" placeholder="Nome" required>
 		<input type="email" name="email" placeholder="Email" required>
 		<input type="password" name="senha" placeholder="Senha" required>
