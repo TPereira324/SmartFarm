@@ -1,14 +1,24 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registo - CocoRoot</title>
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body>
     <div id="app">
         <div class="welcome-container">
+            <a href="../index.html" class="back-arrow">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                    class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                        d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
+                </svg>
+            </a>
             <div class="welcome-image">
                 <img src="../image/Coco.jpeg" alt="Coconuts">
             </div>
@@ -19,27 +29,87 @@
                     </div>
                     <h1 class="brand-name">CocoRoot</h1>
                 </div>
-                
+
                 <form id="register-form" class="login-form">
-                    <div class="input-group">
-                        <label for="fullname">Nome e apelido</label>
-                        <input type="text" id="fullname" name="fullname" placeholder="Digite o seu nome completo" required>
+                    <!-- Step 1: Nome -->
+                    <div class="register-step" id="step-1">
+                        <div class="input-group">
+                            <label for="fullname">Nome completo</label>
+                            <input type="text" id="fullname" name="fullname" placeholder="Digite o seu nome completo"
+                                required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary"
+                                onclick="location.href='../pages/welcomeScreen.html'">Voltar</button>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="email">E-mail</label>
-                        <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
+
+                    <!-- Step 2: Email -->
+                    <div class="register-step hidden" id="step-2">
+                        <div class="input-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="password">Palavra-passe</label>
-                        <input type="password" id="password" name="password" placeholder="Crie uma palavra-passe" required>
+
+                    <!-- Step 3: Telefone -->
+                    <div class="register-step hidden" id="step-3">
+                        <div class="input-group">
+                            <label for="phone">Número de telefone</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Digite o seu número de telefone"
+                                required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
                     </div>
-                    <div class="button-group">
-                        <button type="submit" class="btn-primary">Registar</button>
-                        <button type="button" class="btn-secondary" onclick="location.href='../pages/login.html'">Voltar</button>
+
+                    <!-- Step 4: Nome da Fazenda -->
+                    <div class="register-step hidden" id="step-4">
+                        <div class="input-group">
+                            <label for="farm_name">Nome da sua fazenda</label>
+                            <input type="text" id="farm_name" name="farm_name"
+                                placeholder="Digite o nome da sua fazenda" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Password -->
+                    <div class="register-step hidden" id="step-5">
+                        <div class="input-group">
+                            <label for="password">Palavra-passe</label>
+                            <input type="password" id="password" name="password" placeholder="Crie uma palavra-passe"
+                                required>
+                        </div>
+                        <div class="input-group">
+                            <label for="confirm_password">Confirmar palavra-passe</label>
+                            <input type="password" id="confirm_password" name="confirm_password"
+                                placeholder="Confirme a sua palavra-passe" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary">Finalizar Registo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <!-- MVC Structure -->
+    <script src="../js/models/utilizadorModel.js"></script>
+    <script src="../js/views/utilizadorView.js"></script>
+    <script src="../js/controllers/utilizadorController.js"></script>
+    <script src="../js/load.js"></script>
 </body>
+
 </html>
