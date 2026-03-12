@@ -3,6 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const view = new UtilizadorView();
     const controller = new UtilizadorController(model, view);
 
-    
+    controller.init();
     console.log('Aplicação CocoRoot carregada!');
 });
