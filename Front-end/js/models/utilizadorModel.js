@@ -1,4 +1,4 @@
- register(nome, email, senha, nome_fazenda, agricultor_iniciante) {
+  register(nome, email, senha, nome_fazenda, agricultor_iniciante) {
     try {
         const response = await fetch('../../Back-end/registrar.php', {
             method: 'POST',
