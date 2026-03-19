@@ -11,6 +11,6 @@ if ($mysqli->connect_errno) {
 } else {
     echo "Conexão com o banco de dados bem-sucedida!";
 }
-echo"";
+echo "";
 
 
