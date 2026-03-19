@@ -1,67 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <title>Registo - CocoRoot</title>
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-
-<body>
-    <div id="app">
-        <div class="welcome-container">
-            <!-- Back Button -->
-            <a href="welcomeScreen.html" class="back-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                    class="bi bi-arrow-left-short" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                        d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
-                </svg>
-            </a>
-
-            <div class="welcome-image">
-                <img src="../image/Coco.jpeg" alt="Coconuts">
-            </div>
-            <div class="welcome-content">
-                <div class="logo-section">
-                    <div class="logo-icon">
-                        <img src="../image/logo.jpeg" alt="CocoRoot Logo">
-                    </div>
-                    <h1 class="brand-name">CocoRoot</h1>
-                </div>
-
-                <form id="register-form" class="login-form">
-                    <div class="input-group">
-                        <input type="text" id="fullname" name="fullname" placeholder="Digite o seu nome" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="tel" id="phone" name="phone" placeholder="Digite o seu número de telefone"
-                            required>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="farmname" name="farmname" placeholder="Digite o nome da sua fazenda"
-                            required>
-                    </div>
-                    <div class="input-group">
-                        <input type="password" id="password" name="password" placeholder="Digite a sua palavra-passe"
-                            required>
-                    </div>
-                    <div class="input-group">
-                        <input type="password" id="confirm-password" name="confirm-password"
-                            placeholder="Confirme a sua palavra-passe" required>
-                    </div>
-
-                    <div class="button-group">
-                        <button type="submit" class="btn-primary">Registar-me</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<form id="register-form" class="login-form">
+    <!-- ... campos anteriores ... -->
+    <div class="input-group">
+        <label for="farmname">Nome da Fazenda (Opcional)</label>
+        <input type="text" id="farmname" name="nome_fazenda" placeholder="Digite o nome da sua fazenda">
     </div>
-</body>
-
-</html>
+    <div class="input-group-checkbox">
+        <input type="checkbox" id="is_beginner" name="agricultor_iniciante" value="1">
+        <label for="is_beginner">Sou um agricultor iniciante</label>
+    </div>
+    
+</form>

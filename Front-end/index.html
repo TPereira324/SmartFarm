@@ -3,14 +3,46 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CocoRoot</title>
-    <script>
-        window.location.href = "pages/welcomeScreen.html";
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CocoRoot - Início</title>
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <p>A redirecionar para a aplicação...</p>
+    <div id="app" class="welcome-page">
+        <div class="welcome-container">
+            <div class="welcome-image">
+                <img src="image/Coco.jpeg" alt="Coconuts">
+            </div>
+            <div class="welcome-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <img src="image/logo.jpeg" alt="CocoRoot Logo">
+                    </div>
+                    <h1 class="brand-name">CocoRoot</h1>
+                    <p class="slogan">Gestão inteligente para os seus cultivos</p>
+                </div>
+
+                <ul class="features-list">
+                    <li>Monitorize as suas culturas em tempo real</li>
+                    <li>Receba alertas e dicas personalizadas</li>
+                    <li>Aprenda com outros agricultores</li>
+                </ul>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="location.href='pages/login.html'">Entrar</button>
+                    <button class="btn-secondary" onclick="location.href='pages/registo.html'">Registar-me</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MVC Structure -->
+    <script src="js/models/utilizadorModel.js"></script>
+    <script src="js/views/utilizadorView.js"></script>
+    <script src="js/controllers/utilizadorController.js"></script>
+    <script src="js/load.js"></script>
 </body>
 
 </html>
