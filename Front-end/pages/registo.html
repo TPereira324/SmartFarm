@@ -1,12 +1,114 @@
-<form id="register-form" class="login-form">
-    <!-- ... campos anteriores ... -->
-    <div class="input-group">
-        <label for="farmname">Nome da Fazenda (Opcional)</label>
-        <input type="text" id="farmname" name="nome_fazenda" placeholder="Digite o nome da sua fazenda">
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registo - CocoRoot</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        integrity="sha384-+ZkQdZ5l9QyCkzqg2eXfS6jZVnQmQO3ZC7pCkHn+L5qZf2mY0Gv3vYVxwT3q3Q8VZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="auth-body">
+    <div id="app">
+        <div class="welcome-container">
+            <!--  -->
+            <div class="welcome-image">
+                <a href="#" class="back-arrow"
+                    onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href='../index.html'; } return false;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="white"
+                        class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5" />
+                    </svg>
+                </a>
+                <img src="../image/Coco.jpeg" alt="Coconuts">
+            </div>
+            <div class="welcome-content">
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <img src="../image/logo.jpeg" alt="CocoRoot Logo">
+                    </div>
+                    <h1 class="brand-name">CocoRoot</h1>
+                </div>
+
+                <form id="register-form" class="login-form">
+                    <div class="register-step" id="step-1">
+                        <div class="input-group">
+                            <label for="fullname">Nome completo</label>
+                            <input type="text" id="fullname" name="fullname" placeholder="Digite o seu nome completo"
+                                required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary"
+                                onclick="location.href='../pages/welcomeScreen.html'">Voltar</button>
+                        </div>
+                    </div>
+
+                    <div class="register-step hidden" id="step-2">
+                        <div class="input-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
+                    </div>
+
+                    <div class="register-step hidden" id="step-3">
+                        <div class="input-group">
+                            <label for="phone">Número de telefone</label>
+                            <input type="tel" id="phone" name="phone" placeholder="Digite o seu número de telefone"
+                                required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
+                    </div>
+
+                    <div class="register-step hidden" id="step-4">
+                        <div class="input-group">
+                            <label for="farm_name">Nome da sua fazenda</label>
+                            <input type="text" id="farm_name" name="farm_name"
+                                placeholder="Digite o nome da sua fazenda" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="button" class="btn-primary next-step">Próximo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
+                    </div>
+
+                    <div class="register-step hidden" id="step-5">
+                        <div class="input-group">
+                            <label for="password">Palavra-passe</label>
+                            <input type="password" id="password" name="password" placeholder="Crie uma palavra-passe"
+                                required>
+                        </div>
+                        <div class="input-group">
+                            <label for="confirm_password">Confirmar palavra-passe</label>
+                            <input type="password" id="confirm_password" name="confirm_password"
+                                placeholder="Confirme a sua palavra-passe" required>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary">Finalizar Registo</button>
+                            <button type="button" class="btn-secondary prev-step">Anterior</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="input-group-checkbox">
-        <input type="checkbox" id="is_beginner" name="agricultor_iniciante" value="1">
-        <label for="is_beginner">Sou um agricultor iniciante</label>
-    </div>
-    
-</form>
+
+    <script src="../js/models/utilizadorModel.js"></script>
+    <script src="../js/views/utilizadorView.js"></script>
+    <script src="../js/controllers/utilizadorController.js"></script>
+    <script src="../js/load.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
