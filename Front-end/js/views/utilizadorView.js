@@ -16,6 +16,6 @@ class UtilizadorView {
     }
 
     displayMessage(message, isError = false) {
-        alert(message); 
+        alert(message);
     }
 }

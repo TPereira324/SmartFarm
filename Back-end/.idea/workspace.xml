@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89ba35d9-7932-49ce-9b89-bc8b05d47c76" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/conexao.php" afterDir="false" />
-    </list>
+    <list default="true" id="89ba35d9-7932-49ce-9b89-bc8b05d47c76" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,11 +15,12 @@
   </component>
   <component name="CopilotPersistence">
     <persistenceIdMap>
+      <entry key="_C:/Users/alexr/PhpstormProjects/CocoRoot/Back-end" value="3BAjLgzXhDO2WhuK3WiET3gjNKd" />
       <entry key="_C:/Users/tahaw/Projects/CocoRoot/Back-end" value="3AcD3es6TZOWxbME2SF1w3OnrsS" />
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="15" />
+    <option name="cachedIndexableFilesCount" value="23" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -41,7 +40,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/TPereira324/CocoRoot.git&quot;,
-    &quot;accountId&quot;: &quot;63a27d44-5a17-404d-8fa8-be0bd6cb872e&quot;
+    &quot;accountId&quot;: &quot;4ecc113d-6c71-4152-be13-0fd27288ee9a&quot;
   }
 }</component>
   <component name="McpProjectServerCommands">
@@ -65,7 +64,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "romulo",
+    "git-widget-placeholder": "taha1",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -78,12 +77,12 @@
     "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PS-253.31033.138" />
-        <option value="bundled-php-predefined-a98d8de5180a-0e0d91225499-com.jetbrains.php.sharedIndexes-PS-253.31033.138" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
       </set>
     </attachedChunks>
   </component>
@@ -97,6 +96,7 @@
       <workItem from="1772882769522" duration="856000" />
       <workItem from="1772883806863" duration="813000" />
       <workItem from="1773100205826" duration="38000" />
+      <workItem from="1774050988421" duration="18000" />
     </task>
     <servers />
   </component>

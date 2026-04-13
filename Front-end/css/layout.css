@@ -1,5 +1,5 @@
 /* Layout Styles for CocoRoot */
-body {
+body.auth-body {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,49 +8,28 @@ body {
     background-color: #f4f7f6;
 }
 
-#app {
+body.auth-body #app {
     background: white;
     width: 100vw;
-    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     overflow: hidden;
     display: flex;
 }
 
-.welcome-container {
+body.auth-body .welcome-container {
     display: flex;
     width: 100%;
     height: 100%;
-    position: relative;
 }
 
-.back-arrow {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 10;
-    color: white;
-    text-decoration: none;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 50%;
-    padding: 5px;
-}
-
-.back-arrow:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.4);
-}
-
-.welcome-image {
+body.auth-body .welcome-image {
     width: 50%;
     overflow: hidden;
     border-right: 2px solid #007bff;
+    position: relative;
 }
 
-.welcome-content {
+body.auth-body .welcome-content {
     width: 50%;
     padding: 2rem 4rem;
     display: flex;
@@ -63,7 +42,7 @@ body {
     height: 100vh;
 }
 
-.button-group {
+body.auth-body .button-group {
     width: 100%;
     max-width: 320px;
     display: flex;
