@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — CocoRoot</title>
+    <link rel="stylesheet" href="../css/wireframe.css">
+</head>
+<body class="app-page">
+
+    <!-- NAV -->
+    <nav class="nav">
+        <a href="wireframe_home.html" class="nav-logo">LOGO</a>
+        <div class="nav-links">
+            <a href="wireframe_noticias.html" class="nav-link">Notícias</a>
+            <a href="wireframe_dashboard.html" class="nav-link active">Parcelas</a>
+            <a href="wireframe_comunidade.html" class="nav-link">Comunidade</a>
+            <a href="wireframe_comecar_zero.html" class="nav-link">Guia</a>
+        </div>
+        <div class="nav-right">
+            <div class="nav-user">U</div>
+        </div>
+    </nav>
+
+    <div class="page-content">
+
+        <!-- Intro / título da parcela -->
+        <div class="dash-intro">
+            <div class="txt-line title w65"></div>
+            <div class="txt-line w100"></div>
+            <div class="txt-line w80"></div>
+        </div>
+
+        <!-- Card: Informações gerais com gráfico -->
+        <div class="dash-card" style="margin-bottom:20px;">
+            <div class="dash-card-title">Informações</div>
+            <div style="display:flex;gap:24px;align-items:flex-start;">
+                <div style="flex:2;">
+                    <div class="chart-ph" style="height:180px;">
+                        <svg viewBox="0 0 400 160" preserveAspectRatio="none" style="width:100%;height:100%;display:block;">
+                            <line x1="0" y1="150" x2="400" y2="150" stroke="#ccc" stroke-width="1"/>
+                            <line x1="0" y1="0" x2="0" y2="150" stroke="#ccc" stroke-width="1"/>
+                            <polyline points="0,130 50,110 100,90 150,100 200,70 250,75 300,45 350,55 400,30"
+                                      fill="none" stroke="#555" stroke-width="2.5"/>
+                        </svg>
+                    </div>
+                </div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+                    <div class="txt-line w100"></div>
+                    <div class="txt-line w80"></div>
+                    <div class="txt-line w100"></div>
+                    <div class="txt-line w65"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid: Monitorização + Alertas + Tarefas -->
+        <div class="dash-grid">
+
+            <!-- Monitorização Região -->
+            <div class="dash-card">
+                <div class="dash-card-title">Monit. Região</div>
+                <div class="chart-ph" style="height:200px;">
+                    <svg viewBox="0 0 400 180" preserveAspectRatio="none" style="width:100%;height:100%;display:block;">
+                        <line x1="0" y1="170" x2="400" y2="170" stroke="#ccc" stroke-width="1"/>
+                        <line x1="0" y1="0" x2="0" y2="170" stroke="#ccc" stroke-width="1"/>
+                        <polyline points="0,160 60,130 120,100 180,120 240,80 300,90 360,50 400,60"
+                                  fill="none" stroke="#555" stroke-width="2.5"/>
+                        <polyline points="0,150 60,145 120,120 180,110 240,100 300,85 360,75 400,70"
+                                  fill="none" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/>
+                    </svg>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:24px;">
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <div style="width:16px;height:3px;background:#555;"></div>
+                        <div class="txt-line w40" style="margin:0;width:60px;"></div>
+                    </div>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                        <div style="width:16px;height:3px;background:#aaa;border-top:1px dashed #aaa;"></div>
+                        <div class="txt-line w40" style="margin:0;width:60px;"></div>
+                    </div>
+                </div>
+                <div style="margin-top:14px;">
+                    <button class="btn" style="font-size:11px;padding:8px 16px;">Pesquisar →</button>
+                </div>
+            </div>
+
+            <!-- Alertas + Tarefas -->
+            <div class="side-cards">
+                <div class="dash-card">
+                    <div class="dash-card-title">Alertas</div>
+                    <ul class="alert-list">
+                        <li class="alert-item">
+                            <div class="txt-line w80"></div>
+                            <div class="txt-line w60"></div>
+                        </li>
+                        <li class="alert-item">
+                            <div class="txt-line w80"></div>
+                            <div class="txt-line w60"></div>
+                        </li>
+                        <li class="alert-item">
+                            <div class="txt-line w80"></div>
+                            <div class="txt-line w50"></div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-title">Tarefas</div>
+                    <ul class="task-list">
+                        <li class="task-item">
+                            <div class="txt-line w80"></div>
+                            <div class="txt-line w60"></div>
+                        </li>
+                        <li class="task-item">
+                            <div class="txt-line w80"></div>
+                            <div class="txt-line w60"></div>
+                        </li>
+                        <li class="task-item">
+                            <div class="txt-line w80"></div>
+                            <div class="txt-line w50"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer links -->
+        <div style="margin-top:32px;display:flex;gap:24px;border-top:2px solid #e0e0e0;padding-top:20px;">
+            <div class="footer-logo" style="font-size:12px;">LOGO</div>
+            <div style="display:flex;gap:6px;flex-direction:column;">
+                <div class="txt-line w80" style="background:#bbb;"></div>
+                <div class="txt-line w65" style="background:#bbb;"></div>
+            </div>
+            <div style="margin-left:auto;">
+                <a href="wireframe_login.html" class="btn" style="font-size:11px;padding:8px 16px;">Log In</a>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
