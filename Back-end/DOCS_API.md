@@ -25,21 +25,123 @@
 
 ---
 
-## Resumo dos Endpoints
 
-| Recurso      | Método | Endpoint                        | Descrição                         |
-|--------------|--------|---------------------------------|-----------------------------------|
-| Utilizadores | POST   | /api/usuarios/registar          | Registar novo utilizador          |
-| Utilizadores | POST   | /api/usuarios/login             | Login de utilizador               |
-| Utilizadores | GET    | /api/usuarios/perfil/{id}       | Obter perfil do utilizador        |
-| Parcelas     | POST   | /api/parcelas/adicionar         | Adicionar nova parcela            |
-| Parcelas     | GET    | /api/parcelas/listar/{usuario_id}| Listar parcelas do utilizador     |
-| Tarefas      | POST   | /api/tarefas/adicionar          | Adicionar nova tarefa             |
-| Tarefas      | POST   | /api/tarefas/alternar/{id}      | Alternar estado da tarefa         |
-| Tarefas      | GET    | /api/tarefas/listar/{usuario_id}| Listar tarefas do utilizador      |
-| Fórum        | POST   | /api/forum/publicar             | Publicar novo tópico              |
-| Fórum        | GET    | /api/forum/listar               | Listar todos os tópicos           |
-| Clima        | GET    | /api/clima?cidade={nome}        | Consultar clima atual             |
+| Recurso      | Método | Endpoint                                 | Descrição                              |
+|--------------|--------|------------------------------------------|----------------------------------------|
+| Utilizadores | POST   | /api/usuarios/registar                   | Registar novo utilizador               |
+| Utilizadores | POST   | /api/usuarios/login                      | Login de utilizador                    |
+| Utilizadores | GET    | /api/usuarios/perfil/{id}                | Obter perfil do utilizador             |
+| Parcelas     | POST   | /api/parcelas/adicionar                  | Adicionar nova parcela                 |
+| Parcelas     | GET    | /api/parcelas/listar/{usuario_id}        | Listar parcelas do utilizador          |
+| Tarefas      | POST   | /api/tarefas/adicionar                   | Adicionar nova tarefa                  |
+| Tarefas      | POST   | /api/tarefas/alternar/{id}               | Alternar estado da tarefa              |
+| Tarefas      | GET    | /api/tarefas/listar/{usuario_id}         | Listar tarefas do utilizador           |
+| Fórum        | POST   | /api/forum/publicar                      | Publicar novo tópico                   |
+| Fórum        | GET    | /api/forum/listar                        | Listar todos os tópicos                |
+| Clima        | GET    | /api/clima?cidade={nome}                 | Consultar clima atual                  |
+| Rega         | POST   | /api/rega/registrar                      | Registrar evento de rega na parcela    |
+| Rega         | GET    | /api/rega/listar/{parcela_id}            | Listar eventos de rega da parcela      |
+| Rega         | GET    | /api/rega/sugerir                        | Sugerir quantidade de rega             |
+| Recolha      | POST   | /api/recolha/registrar                   | Registrar evento de recolha na parcela |
+| Recolha      | GET    | /api/recolha/listar/{parcela_id}         | Listar eventos de recolha da parcela   |
+# 6. Rega
+
+### Registrar evento de rega
+**POST** `/api/rega/registrar`
+
+**Body JSON:**
+```json
+{
+  "parcela_id": 10,
+  "data": "2026-04-15",
+  "quantidade_litros": 120.5,
+  "observacoes": "Rega manual"
+}
+```
+**Resposta:**
+```json
+{
+  "status": "sucesso",
+  "mensagem": "Rega registrada!"
+}
+```
+
+### Listar eventos de rega da parcela
+**GET** `/api/rega/listar/{parcela_id}`
+
+**Exemplo:** `/api/rega/listar/10`
+
+**Resposta:**
+```json
+{
+  "status": "sucesso",
+  "dados": [
+    {
+      "id": 1,
+      "parcela_id": 10,
+      "data": "2026-04-15",
+      "quantidade_litros": 120.5,
+      "observacoes": "Rega manual"
+    }
+  ]
+}
+```
+
+### Sugerir quantidade de rega
+**GET** `/api/rega/sugerir?area_m2=1000&tipo_cultura=milho&climaFator=1.2`
+
+**Resposta:**
+```json
+{
+  "status": "sucesso",
+  "quantidade_sugerida": 7200
+}
+```
+
+# 7. Recolha
+
+### Registrar evento de recolha
+**POST** `/api/recolha/registrar`
+
+**Body JSON:**
+```json
+{
+  "parcela_id": 10,
+  "data": "2026-04-15",
+  "quantidade": 50.0,
+  "produto": "Milho",
+  "observacoes": "Colheita parcial"
+}
+```
+**Resposta:**
+```json
+{
+  "status": "sucesso",
+  "mensagem": "Recolha registrada!"
+}
+```
+
+### Listar eventos de recolha da parcela
+**GET** `/api/recolha/listar/{parcela_id}`
+
+**Exemplo:** `/api/recolha/listar/10`
+
+**Resposta:**
+```json
+{
+  "status": "sucesso",
+  "dados": [
+    {
+      "id": 1,
+      "parcela_id": 10,
+      "data": "2026-04-15",
+      "quantidade": 50.0,
+      "produto": "Milho",
+      "observacoes": "Colheita parcial"
+    }
+  ]
+}
+```
 
 ---
 
