@@ -81,16 +81,25 @@
         <script>
             (function() {
                 const user = JSON.parse(localStorage.getItem('user'));
+                const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+
+                // Add notice for non-logged users
                 if (!user) {
-                    alert('Precisa de iniciar sessão para aceder aos módulos.');
-                    window.location.href = 'login.html';
-                    return;
+                    const notice = document.createElement('div');
+                    notice.id = 'login-notice';
+                    notice.style.cssText = 'background:rgba(62,92,50,0.12);border:1px solid rgba(62,92,50,0.3);border-radius:8px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;';
+                    notice.innerHTML = `
+                        <span style="font-size:20px;">🔒</span>
+                        <div style="flex:1;">
+                            <div style="font-weight:900;margin-bottom:4px;">Inicie sessão para acompanhar o seu progresso</div>
+                            <div style="color:var(--muted);font-size:13px;">Os módulos desbloqueiam-se progressivamente após login.</div>
+                        </div>
+                        <a href="login.html" class="btn" style="background:var(--primary);color:white;padding:8px 16px;font-size:13px;">Entrar</a>
+                    `;
+                    const grid = document.querySelector('.modulos-grid');
+                    grid.parentNode.insertBefore(notice, grid.nextSibling);
                 }
 
-                const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
-                
-                // Module 1 is always unlocked
-                
                 // Unlock Module 2 if 1 is completed
                 if (completedModules.includes(1)) {
                     const mod2 = document.getElementById('mod-2');

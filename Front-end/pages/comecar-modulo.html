@@ -82,15 +82,22 @@
     <script>
         (function () {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user) {
-                alert('Precisa de iniciar sessão para aceder aos módulos.');
-                window.location.href = 'login.html';
-                return;
-            }
-
             const params = new URLSearchParams(window.location.search);
             const mod = parseInt(params.get('mod') || '1', 10);
             const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+
+            if (!user) {
+                const pageContent = document.querySelector('.page-content');
+                pageContent.innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;">
+                        <div style="font-size:64px;margin-bottom:20px;">🔒</div>
+                        <div style="font-size:24px;font-weight:900;margin-bottom:12px;">Inicie sessão para continuar</div>
+                        <div style="color:var(--muted);margin-bottom:24px;">Precisa de estar logado para visualizar e realizar os módulos.</div>
+                        <a href="login.html" class="btn" style="background:var(--primary);color:white;padding:14px 28px;font-size:16px;">Iniciar Sessão</a>
+                    </div>
+                `;
+                return;
+            }
 
             if (mod > 1 && !completedModules.includes(mod - 1)) {
                 alert('Precisa de concluir o módulo anterior primeiro.');
