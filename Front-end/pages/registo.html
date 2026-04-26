@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registo - CocoRoot</title>
+    <title>Cadastro - CocoRoot</title>
     <link rel="stylesheet" href="../css/wireframe.css">
 </head>
 
@@ -86,20 +86,20 @@
 
             <div class="register-step hidden" id="step-5">
                 <div class="form-group">
-                    <label for="password">Palavra-passe</label>
-                    <input type="password" id="password" name="password" placeholder="Crie uma palavra-passe" required>
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" placeholder="Crie uma senha" required>
                     <button type="button" id="toggle-register-password" class="btn"
-                        style="margin-top:10px;padding:10px 14px;width:100%;">Mostrar palavra-passe</button>
+                        style="margin-top:10px;padding:10px 14px;width:100%;">Mostrar senha</button>
                 </div>
                 <div class="form-group">
-                    <label for="confirm_password">Confirmar palavra-passe</label>
+                    <label for="confirm_password">Confirmar senha</label>
                     <input type="password" id="confirm_password" name="confirm_password"
-                        placeholder="Confirme a sua palavra-passe" required>
+                        placeholder="Confirme sua senha" required>
                     <button type="button" id="toggle-register-confirm-password" class="btn"
                         style="margin-top:10px;padding:10px 14px;width:100%;">Mostrar confirmação</button>
                 </div>
                 <div class="btn-group">
-                    <button type="submit" class="btn full">Finalizar Registo</button>
+                    <button type="submit" class="btn full">Finalizar Cadastro</button>
                     <button type="button" class="btn full prev-step">Anterior</button>
                 </div>
             </div>
@@ -168,7 +168,7 @@
                     toggleRegPasswordBtn.addEventListener('click', () => {
                         const isHidden = regPasswordInput.type === 'password';
                         regPasswordInput.type = isHidden ? 'text' : 'password';
-                        toggleRegPasswordBtn.textContent = isHidden ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe';
+                        toggleRegPasswordBtn.textContent = isHidden ? 'Ocultar senha' : 'Mostrar senha';
                     });
                 }
 

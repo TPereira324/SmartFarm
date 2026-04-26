@@ -13,12 +13,12 @@ class UtilizadorModel {
             const data = await response.json().catch(() => null);
 
             if (!response.ok || !data) {
-                return { success: false, message: 'Servidor indisponivel para registo.' };
+                return { success: false, message: 'Servidor indisponível para cadastro.' };
             }
 
             return data;
         } catch (error) {
-            return { success: false, message: 'Falha na ligacao ao servidor de registo.' };
+            return { success: false, message: 'Falha na ligação ao servidor de cadastro.' };
         }
     }
 }

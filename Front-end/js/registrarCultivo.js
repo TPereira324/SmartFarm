@@ -138,7 +138,7 @@
         const payload = {
             ut_id: user.id,
             par_nome: `${state.tipo || 'Cultivo'} ${new Date().toLocaleDateString('pt-PT')}`,
-            par_estado: 'Saudavel',
+            par_estado: 'Saudável',
             largura,
             comprimento,
             profundidade,
@@ -157,7 +157,7 @@
             });
             window.location.href = 'dashboard.html';
         } catch (error) {
-            setError(error.message || 'Nao foi possivel guardar o cultivo na base de dados.');
+            setError(error.message || 'Não foi possível salvar o cultivo no banco de dados.');
         } finally {
             if (btnSave) btnSave.disabled = false;
         }

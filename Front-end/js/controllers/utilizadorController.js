@@ -109,15 +109,15 @@ class UtilizadorController {
             if (this.model && typeof this.model.register === 'function') {
                 const result = await this.model.register(userData);
                 if (!result || result.success !== true) {
-                    this.view.displayMessage(result?.message || 'Falha ao registar.', true);
+                    this.view.displayMessage(result?.message || 'Falha ao registrar.', true);
                     return;
                 }
             }
 
-            this.view.displayMessage('Registo concluído com sucesso!');
+            this.view.displayMessage('Cadastro concluído com sucesso!');
             window.location.href = 'login.html';
         } catch (e) {
-            this.view.displayMessage('Falha ao registar.', true);
+            this.view.displayMessage('Falha ao registrar.', true);
         }
     }
 }

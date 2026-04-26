@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo - CocoRoot</title>
     <link rel="stylesheet" href="../css/wireframe.css">
 </head>
+
 <body class="app-page">
-    
+
 
     <div class="page-content" style="max-width:900px;">
         <div style="margin-bottom:18px;">
@@ -16,23 +18,31 @@
 
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;">
             <div>
-                <div id="modulo-kicker" style="font-size:12px;font-weight:900;letter-spacing:0.2px;color:var(--muted);margin-bottom:6px;">MÓDULO 1</div>
-                <div id="modulo-title" style="font-size:30px;font-weight:900;letter-spacing:-0.6px;line-height:1.15;">Introdução</div>
+                <div id="modulo-kicker"
+                    style="font-size:12px;font-weight:900;letter-spacing:0.2px;color:var(--muted);margin-bottom:6px;">
+                    MÓDULO 1</div>
+                <div id="modulo-title" style="font-size:30px;font-weight:900;letter-spacing:-0.6px;line-height:1.15;">
+                    Introdução</div>
             </div>
-            <div id="modulo-status" style="border:1px solid rgba(27,27,27,0.14);border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;color:rgba(27,27,27,0.74);background:rgba(255,255,255,0.92);box-shadow:0 14px 26px rgba(0,0,0,0.06);">● Em curso</div>
+            <div id="modulo-status"
+                style="border:1px solid rgba(27,27,27,0.14);border-radius:999px;padding:10px 14px;font-size:12px;font-weight:900;color:rgba(27,27,27,0.74);background:rgba(255,255,255,0.92);box-shadow:0 14px 26px rgba(0,0,0,0.06);">
+                ● Em curso</div>
         </div>
 
         <div class="modulo-img img-ph" style="overflow:hidden;padding:0;">
-            
+
         </div>
 
-        <div style="font-size:12px;font-weight:900;letter-spacing:0.2px;text-transform:uppercase;margin-bottom:12px;color:rgba(27,27,27,0.78);">Passo a Passo</div>
+        <div
+            style="font-size:12px;font-weight:900;letter-spacing:0.2px;text-transform:uppercase;margin-bottom:12px;color:rgba(27,27,27,0.78);">
+            Passo a Passo</div>
         <ul class="step-checklist">
             <li>
                 <div class="step-check done">✓</div>
                 <div style="flex:1;">
                     <div style="font-weight:900;margin-bottom:4px;">Preparar o espaço de trabalho</div>
-                    <div style="color:var(--muted);line-height:1.6;">Organize materiais e assegure ventilação e limpeza.</div>
+                    <div style="color:var(--muted);line-height:1.6;">Organize materiais e assegure ventilação e limpeza.
+                    </div>
                 </div>
             </li>
             <li>
@@ -52,29 +62,44 @@
             <li>
                 <div class="step-check"></div>
                 <div style="flex:1;">
-                    <div style="font-weight:900;margin-bottom:4px;">Registar no dashboard</div>
-                    <div style="color:var(--muted);line-height:1.6;">Guarde medições e notas para acompanhamento.</div>
+                    <div style="font-weight:900;margin-bottom:4px;">Registrar no painel</div>
+                    <div style="color:var(--muted);line-height:1.6;">Salve medições e notas para acompanhamento.</div>
                 </div>
             </li>
         </ul>
 
         <div style="margin-top:26px;">
-            <div style="font-size:12px;font-weight:900;letter-spacing:0.2px;text-transform:uppercase;margin-bottom:12px;color:rgba(27,27,27,0.78);">Materiais Necessários</div>
+            <div
+                style="font-size:12px;font-weight:900;letter-spacing:0.2px;text-transform:uppercase;margin-bottom:12px;color:rgba(27,27,27,0.78);">
+                Materiais Necessários</div>
             <div class="materiais-grid">
                 <ul class="materiais-list">
-                    <li><div class="bullet"></div><div style="flex:1;">Balde / recipiente</div></li>
-                    <li><div class="bullet"></div><div style="flex:1;">Medidor de pH/EC (opcional)</div></li>
-                    <li><div class="bullet"></div><div style="flex:1;">Regador / sistema de rega</div></li>
-                    <li><div class="bullet"></div><div style="flex:1;">Luvas e tesoura</div></li>
+                    <li>
+                        <div class="bullet"></div>
+                        <div style="flex:1;">Balde / recipiente</div>
+                    </li>
+                    <li>
+                        <div class="bullet"></div>
+                        <div style="flex:1;">Medidor de pH/EC (opcional)</div>
+                    </li>
+                    <li>
+                        <div class="bullet"></div>
+                        <div style="flex:1;">Regador / sistema de rega</div>
+                    </li>
+                    <li>
+                        <div class="bullet"></div>
+                        <div style="flex:1;">Luvas e tesoura</div>
+                    </li>
                 </ul>
                 <div class="img-ph" style="height:160px;overflow:hidden;padding:0;">
-                    
+
                 </div>
             </div>
         </div>
 
         <div style="margin-top:22px;display:flex;justify-content:flex-end;gap:12px;">
-            <button id="finish-module" class="btn" style="background:var(--primary);color:white;">Concluir Módulo</button>
+            <button id="finish-module" class="btn" style="background:var(--primary);color:white;">Concluir
+                Módulo</button>
             <a id="next-module" href="comecar-modulo.html?mod=2" class="btn" style="display:none;">Próximo Módulo →</a>
         </div>
     </div>
@@ -92,7 +117,7 @@
                     <div style="text-align:center;padding:60px 20px;">
                         <div style="font-size:64px;margin-bottom:20px;">🔒</div>
                         <div style="font-size:24px;font-weight:900;margin-bottom:12px;">Inicie sessão para continuar</div>
-                        <div style="color:var(--muted);margin-bottom:24px;">Precisa de estar logado para visualizar e realizar os módulos.</div>
+                        <div style="color:var(--muted);margin-bottom:24px;">Precisa de ter sessão iniciada para visualizar e realizar os módulos.</div>
                         <a href="login.html" class="btn" style="background:var(--primary);color:white;padding:14px 28px;font-size:16px;">Iniciar Sessão</a>
                     </div>
                 `;
@@ -114,7 +139,7 @@
             const current = modules[mod] || modules[1];
             document.getElementById('modulo-kicker').textContent = 'MÓDULO ' + (modules[mod] ? mod : 1);
             document.getElementById('modulo-title').textContent = current.title;
-            
+
             // Fix: set image if element exists or just update the placeholder
             const imgPlaceholder = document.querySelector('.modulo-img');
             if (imgPlaceholder) {
@@ -142,7 +167,7 @@
                     completed.push(mod);
                     localStorage.setItem('completedModules', JSON.stringify(completed));
                 }
-                
+
                 finishBtn.style.display = 'none';
                 if (modules[next]) {
                     nextBtn.style.display = 'inline-block';
@@ -155,6 +180,7 @@
             document.title = 'Módulo ' + (modules[mod] ? mod : 1) + ' - CocoRoot';
         })();
     </script>
-<script src="../js/layout.js"></script>
+    <script src="../js/layout.js"></script>
 </body>
+
 </html>

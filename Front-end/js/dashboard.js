@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (alertasCount) alertasCount.textContent = '0';
         renderEmpty(parcelasContainer, 'Não foi possível carregar as parcelas da base de dados.');
         renderEmpty(tarefasContainer, 'As tarefas não puderam ser carregadas.');
-        renderEmpty(monitorizacaoContainer, 'A monitorização não está disponível.');
+        renderEmpty(monitorizacaoContainer, 'O monitoramento não está disponível.');
         renderEmpty(climaContainer, 'O clima não está disponível.');
         setError(error.message || 'Erro ao carregar o dashboard.');
     }

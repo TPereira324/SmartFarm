@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registar Cultivo — CocoRoot</title>
+    <title>Registrar Cultivo — CocoRoot</title>
     <link rel="stylesheet" href="../css/wireframe.css">
     <link rel="stylesheet" href="../css/cultivo.css">
 </head>
+
 <body class="app-page">
 
-    
+
 
     <div class="page-content">
         <div class="cultivo-wrapper">
@@ -17,7 +19,7 @@
             <div class="cultivo-topbar">
                 <a href="dashboard.html" class="back-link">← Voltar</a>
                 <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;">
-                    <div class="cultivo-title">Registar Cultivo</div>
+                    <div class="cultivo-title">Registrar Cultivo</div>
                     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:flex-end;">
                         <div class="cultivo-stepper" aria-hidden="true">
                             <div class="cultivo-stepper-dot active" data-stepper-dot></div>
@@ -43,7 +45,8 @@
                             <div class="form-group" style="margin-bottom:0;">
                                 <label for="largura">Largura</label>
                                 <div class="field-inline">
-                                    <input id="largura" name="largura" type="number" min="0" step="0.01" inputmode="decimal" required>
+                                    <input id="largura" name="largura" type="number" min="0" step="0.01"
+                                        inputmode="decimal" required>
                                     <div class="field-unit">m</div>
                                 </div>
                             </div>
@@ -51,7 +54,8 @@
                             <div class="form-group" style="margin-bottom:0;">
                                 <label for="comprimento">Comprimento</label>
                                 <div class="field-inline">
-                                    <input id="comprimento" name="comprimento" type="number" min="0" step="0.01" inputmode="decimal" required>
+                                    <input id="comprimento" name="comprimento" type="number" min="0" step="0.01"
+                                        inputmode="decimal" required>
                                     <div class="field-unit">m</div>
                                 </div>
                             </div>
@@ -59,7 +63,8 @@
                             <div class="form-group" style="margin-bottom:0;">
                                 <label for="profundidade">Profundidade</label>
                                 <div class="field-inline">
-                                    <input id="profundidade" name="profundidade" type="number" min="0" step="0.01" inputmode="decimal" required>
+                                    <input id="profundidade" name="profundidade" type="number" min="0" step="0.01"
+                                        inputmode="decimal" required>
                                     <div class="field-unit">m</div>
                                 </div>
                             </div>
@@ -72,7 +77,8 @@
                         <div class="dash-card-title" style="margin-bottom:18px;">Escolher tipo de cultura</div>
                         <div class="form-group" style="margin-bottom:0;">
                             <label for="tipo">Tipo</label>
-                            <select id="tipo" name="tipo" class="btn" style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
+                            <select id="tipo" name="tipo" class="btn"
+                                style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
                                 <option value="" selected>Seleciona…</option>
                                 <option value="Tomate">Tomate</option>
                                 <option value="Morango">Morango</option>
@@ -88,7 +94,8 @@
                         <div class="dash-card-title" style="margin-bottom:18px;">Escolher objetivo do cultivo</div>
                         <div class="form-group" style="margin-bottom:0;">
                             <label for="objetivo">Objetivo</label>
-                            <select id="objetivo" name="objetivo" class="btn" style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
+                            <select id="objetivo" name="objetivo" class="btn"
+                                style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
                                 <option value="" selected>Seleciona…</option>
                                 <option value="Produção">Produção</option>
                                 <option value="Teste">Teste</option>
@@ -103,7 +110,8 @@
                         <div class="dash-card-title" style="margin-bottom:18px;">Escolher método de cultivo</div>
                         <div class="form-group" style="margin-bottom:0;">
                             <label for="metodo">Método</label>
-                            <select id="metodo" name="metodo" class="btn" style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
+                            <select id="metodo" name="metodo" class="btn"
+                                style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
                                 <option value="" selected>Seleciona…</option>
                                 <option value="Vasos">Vasos</option>
                                 <option value="Hidroponia">Hidroponia</option>
@@ -141,8 +149,8 @@
                 <div class="cultivo-actions">
                     <button class="btn" type="button" data-step-prev hidden>Voltar</button>
                     <div style="margin-left:auto;display:flex;gap:12px;flex-wrap:wrap;">
-                        <button class="btn" type="button" data-step-next>Next →</button>
-                        <button class="btn" type="button" data-step-save hidden>Guardar cultivo</button>
+                        <button class="btn" type="button" data-step-next>Próximo →</button>
+                        <button class="btn" type="button" data-step-save hidden>Salvar cultivo</button>
                     </div>
                 </div>
 
@@ -155,4 +163,5 @@
     <script src="../js/registrarCultivo.js"></script>
     <script src="../js/layout.js"></script>
 </body>
+
 </html>

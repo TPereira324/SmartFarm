@@ -28,18 +28,18 @@
 
         <form id="login-form" action="../../Back-end/login.php" method="POST">
             <div class="form-group">
-                <label for="email">Nome e e-mail</label>
-                <input type="email" id="email" name="email" placeholder="Digite o seu nome e e-mail" required>
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" placeholder="Digite o seu e-mail" required>
             </div>
             <div class="form-group">
-                <label for="password">Palavra-passe</label>
-                <input type="password" id="password" name="password" placeholder="Digite a sua palavra-passe" required>
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
                 <button type="button" id="toggle-login-password" class="btn"
-                    style="margin-top:10px;padding:10px 14px;width:100%;">Mostrar palavra-passe</button>
+                    style="margin-top:10px;padding:10px 14px;width:100%;">Mostrar senha</button>
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn full">Entrar</button>
-                <a href="registo.html" class="btn full">Registar-me</a>
+                <a href="registo.html" class="btn full">Registrar-me</a>
             </div>
         </form>
     </div>
@@ -52,7 +52,7 @@
             toggleLoginPasswordBtn.addEventListener('click', () => {
                 const isHidden = loginPasswordInput.type === 'password';
                 loginPasswordInput.type = isHidden ? 'text' : 'password';
-                toggleLoginPasswordBtn.textContent = isHidden ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe';
+                toggleLoginPasswordBtn.textContent = isHidden ? 'Ocultar senha' : 'Mostrar senha';
             });
         }
 
