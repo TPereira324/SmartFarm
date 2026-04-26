@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const parcelasCount = document.getElementById('dashboard-parcelas-count');
     const tarefasCount = document.getElementById('dashboard-tarefas-count');
     const alertasCount = document.getElementById('dashboard-alertas-count');
+    const alertasLabel = document.getElementById('dashboard-alertas-label');
     const parcelasContainer = document.getElementById('dashboard-parcelas-list');
     const tarefasContainer = document.getElementById('dashboard-tarefas-list');
     const monitorizacaoContainer = document.getElementById('dashboard-monitorizacao');
@@ -92,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             temp_max: tempMax,
             temp_min: tempMin,
             descricao: weatherCodeToText(current.weather_code),
+            atualizado_em: current.time || null,
             fonte: 'open-meteo',
         };
     };
@@ -99,14 +101,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fetchWeather = async (city) => {
         const cityName = String(city || '').trim() || 'Lisboa';
         try {
-            const response = await api.fetchJson(`clima?cidade=${encodeURIComponent(cityName)}`);
-            const clima = response?.data || null;
-            if (clima) return clima;
-        } catch { }
-
-        try {
             return await fetchWeatherFromOpenMeteo(cityName);
         } catch {
+            try {
+                const response = await api.fetchJson(`clima?cidade=${encodeURIComponent(cityName)}`);
+                const clima = response?.data || null;
+                if (clima) return clima;
+            } catch { }
             return null;
         }
     };
@@ -323,6 +324,181 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
     };
 
+    const getAlertText = (alerta) => String(alerta?.mensagem || alerta?.message || '').trim();
+    const getAlertTitle = (alerta) => String(alerta?.titulo || alerta?.title || 'Alerta').trim();
+    const getAlertLevel = (alerta) => {
+        const v = normalizeText(alerta?.nivel || alerta?.level || alerta?.tipo || '');
+        if (v.includes('danger') || v.includes('crit') || v.includes('erro')) return 'danger';
+        if (v.includes('warn') || v.includes('aten')) return 'warning';
+        return 'info';
+    };
+
+    const getAlertCategory = (alerta) => {
+        const raw = String(alerta?.categoria || alerta?.cat || alerta?.origem || alerta?.source || '').trim();
+        if (raw) return raw;
+
+        const where = String(alerta?.parcela_nome || alerta?.parcela || '').trim();
+        if (where) return 'Parcela';
+
+        const title = normalizeText(getAlertTitle(alerta));
+        const text = normalizeText(getAlertText(alerta));
+        const combined = `${title} ${text}`;
+        if (combined.includes('clima') || combined.includes('temperatura') || combined.includes('chuva') || combined.includes('trovoada')) return 'Clima';
+        if (combined.includes('tarefa')) return 'Tarefas';
+        if (combined.includes('cultivo')) return 'Cultivo';
+        return 'Sistema';
+    };
+
+    const renderAlertsCard = (alertas) => {
+        const list = Array.isArray(alertas) ? alertas : [];
+        const dots = { info: '#2f6f3f', warning: '#b7791f', danger: '#b42318' };
+        const badges = { info: 'rgba(47,111,63,0.12)', warning: 'rgba(183,121,31,0.14)', danger: 'rgba(180,35,24,0.12)' };
+        const borders = { info: 'rgba(47,111,63,0.28)', warning: 'rgba(183,121,31,0.34)', danger: 'rgba(180,35,24,0.30)' };
+        const levelText = { info: 'Info', warning: 'Atenção', danger: 'Crítico' };
+        if (list.length === 0) {
+            return `
+                <div class="dash-card">
+                    <div class="dash-card-title">Alertas</div>
+                    <div style="color:var(--muted);line-height:1.6;">Sem alertas no momento.</div>
+                </div>
+            `;
+        }
+        const items = list.slice(0, 6).map((a) => {
+            const level = getAlertLevel(a);
+            const dot = dots[level] || dots.info;
+            const badgeBg = badges[level] || badges.info;
+            const badgeBorder = borders[level] || borders.info;
+            const levelLabel = levelText[level] || levelText.info;
+            const category = getAlertCategory(a);
+            const title = getAlertTitle(a);
+            const text = getAlertText(a);
+            const where = String(a?.parcela_nome || a?.parcela || '').trim();
+            const meta = where ? ` · ${where}` : '';
+            return `
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                    <div style="width:10px;height:10px;border-radius:50%;margin-top:6px;background:${dot};flex-shrink:0;"></div>
+                    <div>
+                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px;">
+                            <div style="font-weight:900;">${title}${meta}</div>
+                            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                                <span style="font-size:11px;font-weight:900;padding:4px 8px;border-radius:999px;border:1px solid ${badgeBorder};background:${badgeBg};">${category}</span>
+                                <span style="font-size:11px;font-weight:900;padding:4px 8px;border-radius:999px;border:1px solid ${badgeBorder};background:${badgeBg};">${levelLabel}</span>
+                            </div>
+                        </div>
+                        <div style="color:var(--muted);line-height:1.6;">${text}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        const more = list.length > 6
+            ? `<div style="color:var(--muted);margin-top:10px;">+${list.length - 6} alertas</div>`
+            : '';
+        return `
+            <div class="dash-card">
+                <div class="dash-card-title">Alertas</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">${items}${more}</div>
+            </div>
+        `;
+    };
+
+    const generateAlerts = ({ parcelas, tarefas, clima }) => {
+        const alerts = [];
+        const add = (nivel, categoria, titulo, mensagem, extra = {}) => {
+            alerts.push({
+                id: buildTaskId(),
+                nivel,
+                categoria,
+                titulo,
+                mensagem,
+                ...extra,
+            });
+        };
+
+        const now = new Date();
+
+        if (!Array.isArray(parcelas) || parcelas.length === 0) {
+            add('info', 'Sistema', 'Sem parcelas registadas', 'Registe um cultivo para começar a receber tarefas e alertas.');
+            return alerts;
+        }
+
+        parcelas.forEach((parcela) => {
+            const estado = normalizeText(parcela?.estado || parcela?.par_estado || '');
+            const parcelaNome = getParcelaLabel(parcela);
+            const cultivoNome = getCultivoLabel(parcela);
+
+            if (!cultivoNome) {
+                add('info', 'Cultivo', 'Cultivo não definido', 'Defina o tipo de cultivo para gerar tarefas mais específicas.', { parcela_nome: parcelaNome });
+            }
+            if (estado.includes('critic')) {
+                add('danger', 'Parcela', 'Parcela em estado crítico', 'Verifique imediatamente rega, drenagem e sinais de pragas/doenças.', { parcela_nome: parcelaNome });
+            } else if (estado.includes('aten') || estado.includes('alert')) {
+                add('warning', 'Parcela', 'Parcela em atenção', 'Reveja humidade do substrato e faça uma inspeção rápida.', { parcela_nome: parcelaNome });
+            }
+        });
+
+        const pending = (Array.isArray(tarefas) ? tarefas : []).filter((t) => {
+            const done = normalizeText(t?.estado).includes('conclu');
+            const due = new Date(t?.data_inicio || t?.dueDate || 0);
+            return !done && Number.isFinite(due.getTime()) && due.getTime() <= now.getTime();
+        });
+        if (pending.length > 0) {
+            add('warning', 'Tarefas', 'Tarefas em atraso', `Tem ${pending.length} tarefa(s) para fazer até hoje.`, {});
+        }
+
+        if (clima) {
+            const round = (value) => {
+                const n = Number(value);
+                return Number.isFinite(n) ? Math.round(n) : null;
+            };
+
+            const tempNow = round(clima.temperatura);
+            const feelsLike = round(clima.sensacao_termica);
+            const tempMax = round(clima.temp_max);
+            const tempMin = round(clima.temp_min);
+            const hum = round(clima.humidade);
+            const desc = normalizeText(clima.descricao || '');
+
+            const tempLabel = (n) => (n === null ? '—' : `${n}°C`);
+            const nowText = `Agora: ${tempLabel(tempNow)}${feelsLike !== null ? ` (sensação ${tempLabel(feelsLike)})` : ''}`;
+            const rangeText = (tempMin !== null || tempMax !== null)
+                ? ` · Mín ${tempLabel(tempMin)} · Máx ${tempLabel(tempMax)}`
+                : '';
+
+            const hotSignal = [tempNow, feelsLike, tempMax].filter((n) => n !== null);
+            const coldSignal = [tempNow, feelsLike, tempMin].filter((n) => n !== null);
+            const maxHot = hotSignal.length ? Math.max(...hotSignal) : null;
+            const minCold = coldSignal.length ? Math.min(...coldSignal) : null;
+
+            if (maxHot !== null && maxHot >= 35) {
+                add('danger', 'Clima', 'Calor extremo', `${nowText}${rangeText}. Reforce rega/monitorização e evite stress hídrico.`);
+            } else if (maxHot !== null && maxHot >= 32) {
+                add('warning', 'Clima', 'Calor elevado', `${nowText}${rangeText}. Aumente a frequência de verificação de humidade e ajuste a rega.`);
+            }
+
+            if (minCold !== null && minCold <= 2) {
+                add('danger', 'Clima', 'Frio extremo', `${nowText}${rangeText}. Proteja as plantas e evite regas tardias que aumentem o risco de frio.`);
+            } else if (minCold !== null && minCold <= 6) {
+                add('warning', 'Clima', 'Temperatura baixa', `${nowText}${rangeText}. Atenção a stress térmico; ajuste rega e proteção se necessário.`);
+            }
+
+            if (tempMax !== null && tempMin !== null && tempMax - tempMin >= 15) {
+                add('info', 'Clima', 'Amplitude térmica alta', `Variação prevista: ${tempLabel(tempMin)} → ${tempLabel(tempMax)}. Monitore humidade e sinais de stress.`);
+            }
+
+            if (hum !== null && hum <= 30 && maxHot !== null && maxHot >= 30) {
+                add('warning', 'Clima', 'Ar seco + calor', `Humidade ${hum}% com calor. O substrato pode secar mais rápido; verifique humidade com maior frequência.`);
+            } else if (hum !== null && hum <= 30) {
+                add('info', 'Clima', 'Humidade relativa baixa', `Humidade ${hum}%. Monitore a secagem do substrato ao longo do dia.`);
+            }
+
+            if (desc.includes('trovoada') || desc.includes('chuva') || desc.includes('aguace')) {
+                add('info', 'Clima', 'Condições de chuva', 'Evite rega excessiva e confirme drenagem.');
+            }
+        }
+
+        return alerts;
+    };
+
     try {
         const [parcelasResponse, tarefasResponse, alertasResponse, clima] = await Promise.all([
             api.fetchJson(`parcelas/listar/${user.id}`),
@@ -333,13 +509,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const parcelas = Array.isArray(parcelasResponse?.data) ? parcelasResponse.data : [];
         const serverTarefas = Array.isArray(tarefasResponse?.data) ? tarefasResponse.data : [];
-        const alertas = Array.isArray(alertasResponse?.data) ? alertasResponse.data : [];
+        const serverAlertas = Array.isArray(alertasResponse?.data) ? alertasResponse.data : [];
 
         if (parcelasCount) parcelasCount.textContent = String(parcelas.length);
-        if (alertasCount) alertasCount.textContent = String(alertas.length);
+        if (alertasCount) alertasCount.textContent = String(serverAlertas.length);
+        if (alertasLabel) alertasLabel.textContent = '';
 
         if (parcelas.length === 0) {
-            renderEmpty(parcelasContainer, 'Ainda não existem parcelas registadas na base de dados.');
+            renderEmpty(parcelasContainer, 'Ainda não existem parcelas registadas.');
         } else if (parcelasContainer) {
             parcelasContainer.innerHTML = parcelas.map((parcela) => {
                 const cultivos = Array.isArray(parcela.cultivos) ? parcela.cultivos : [];
@@ -409,6 +586,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderTasks(tarefas, { onlyToday: true });
         }
 
+        const hasServerAlerts = serverAlertas.length > 0;
+        const alertas = hasServerAlerts
+            ? serverAlertas
+            : generateAlerts({ parcelas, tarefas, clima });
+
+        if (alertasCount) alertasCount.textContent = String(Array.isArray(alertas) ? alertas.length : 0);
+        if (alertasLabel) {
+            alertasLabel.textContent = '';
+        }
+
         if (monitorizacaoContainer) {
             const totalArea = parcelas.reduce((sum, parcela) => sum + Number(parcela.area_m2 || 0), 0);
             const healthyCount = parcelas.filter((parcela) => String(parcela.estado || '').toLowerCase().includes('saud')).length;
@@ -422,7 +609,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="dash-card">
                     <div class="dash-card-title">Área total registada</div>
                     <div style="font-size:28px;font-weight:900;line-height:1;">${formatArea(totalArea)}</div>
-                    <div style="color:var(--muted);margin-top:6px;">Somatório das parcelas guardadas na base de dados.</div>
+                    <div style="color:var(--muted);margin-top:6px;">Somatório das parcelas registadas.</div>
                 </div>
                 <div class="dash-card">
                     <div class="dash-card-title">Estado das parcelas</div>
@@ -432,6 +619,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         Cultivos associados: ${cultivosCount}
                     </div>
                 </div>
+                ${renderAlertsCard(alertas)}
             `;
         }
 
@@ -439,6 +627,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!clima) {
                 renderEmpty(climaContainer, 'A integração de clima ainda não está disponível no servidor atual.');
             } else {
+                const fonte = String(clima.fonte || '').toLowerCase().includes('open')
+                    ? 'Open‑Meteo'
+                    : 'CocoRoot API';
+                const updatedAt = clima.atualizado_em || clima.updated_at || clima.time || null;
+                const updatedText = updatedAt ? formatShortDateTime(updatedAt) : '';
                 climaContainer.innerHTML = `
                     <div class="dash-card">
                         <div class="dash-card-title">Agora em ${clima.cidade || 'Lisboa'}</div>
@@ -446,6 +639,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div>
                                 <div style="font-size:34px;font-weight:900;line-height:1;">${Math.round(Number(clima.temperatura || 0))}°C</div>
                                 <div style="color:var(--muted);margin-top:6px;">${clima.descricao || 'Sem descrição'} · Humidade ${clima.humidade ?? '—'}%</div>
+                                <div style="color:var(--muted);margin-top:6px;font-size:12px;">Fonte: ${fonte}${updatedText ? ` · Atualizado: ${updatedText}` : ''}</div>
                             </div>
                             <div style="color:var(--muted);line-height:1.8;">
                                 Sensação: ${clima.sensacao_termica ?? '—'}°C<br>
