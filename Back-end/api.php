@@ -42,6 +42,15 @@ if (!empty($_POST)) {
     $body = array_merge($body, $_POST);
 }
 
+$forumCategoryLabel = static function (?string $category): string {
+    return match ($category) {
+        'duvidas' => 'Dúvida',
+        'dicas' => 'Dica',
+        'experiencias' => 'Experiência',
+        default => 'Outro',
+    };
+};
+
 if ($resource === "parcelas" && $action === "listar" && $method === "GET") {
     $utId = $id !== null ? (int)$id : (int)($_GET["ut_id"] ?? 0);
     if ($utId <= 0) {
@@ -198,6 +207,226 @@ if ($resource === "parcelas" && $action === "adicionar" && $method === "POST") {
         $mysqli->rollback();
         $respond(["success" => false, "message" => $e->getMessage()], 500);
     }
+}
+
+if ($resource === "forum" && $action === "listar" && $method === "GET") {
+    $sql = "SELECT
+                p.post_id,
+                p.post_titulo,
+                p.post_conteudo,
+                p.post_categoria,
+                p.post_data,
+                u.ut_id,
+                u.ut_nome,
+                COUNT(c.com_id) AS comentarios
+            FROM post p
+            INNER JOIN utilizador u ON u.ut_id = p.post_ut_id
+            LEFT JOIN comentario c ON c.com_post_id = p.post_id
+            GROUP BY p.post_id, p.post_titulo, p.post_conteudo, p.post_categoria, p.post_data, u.ut_id, u.ut_nome
+            ORDER BY p.post_data DESC";
+    $result = $mysqli->query($sql);
+    if (!$result) {
+        $respond(["success" => false, "message" => "Erro ao carregar publicações."], 500);
+    }
+
+    $posts = [];
+    while ($row = $result->fetch_assoc()) {
+        $posts[] = [
+            "id" => (int)$row["post_id"],
+            "titulo" => $row["post_titulo"],
+            "conteudo" => $row["post_conteudo"],
+            "categoria" => $row["post_categoria"],
+            "categoria_label" => $forumCategoryLabel($row["post_categoria"] ?? null),
+            "data" => $row["post_data"],
+            "comentarios" => (int)$row["comentarios"],
+            "autor" => [
+                "id" => (int)$row["ut_id"],
+                "nome" => $row["ut_nome"],
+            ],
+        ];
+    }
+
+    $respond([
+        "success" => true,
+        "data" => $posts,
+    ]);
+}
+
+if ($resource === "forum" && $action === "detalhe" && $method === "GET") {
+    $postId = (int)$id;
+    if ($postId <= 0) {
+        $respond(["success" => false, "message" => "Publicação inválida."], 400);
+    }
+
+    $stmt = $mysqli->prepare(
+        "SELECT
+            p.post_id,
+            p.post_titulo,
+            p.post_conteudo,
+            p.post_categoria,
+            p.post_data,
+            u.ut_id,
+            u.ut_nome,
+            COUNT(c.com_id) AS comentarios
+        FROM post p
+        INNER JOIN utilizador u ON u.ut_id = p.post_ut_id
+        LEFT JOIN comentario c ON c.com_post_id = p.post_id
+        WHERE p.post_id = ?
+        GROUP BY p.post_id, p.post_titulo, p.post_conteudo, p.post_categoria, p.post_data, u.ut_id, u.ut_nome
+        LIMIT 1"
+    );
+    if (!$stmt) {
+        $respond(["success" => false, "message" => "Erro ao preparar detalhe da publicação."], 500);
+    }
+
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result ? $result->fetch_assoc() : null;
+    $stmt->close();
+
+    if (!$row) {
+        $respond(["success" => false, "message" => "Publicação não encontrada."], 404);
+    }
+
+    $respond([
+        "success" => true,
+        "data" => [
+            "id" => (int)$row["post_id"],
+            "titulo" => $row["post_titulo"],
+            "conteudo" => $row["post_conteudo"],
+            "categoria" => $row["post_categoria"],
+            "categoria_label" => $forumCategoryLabel($row["post_categoria"] ?? null),
+            "data" => $row["post_data"],
+            "comentarios" => (int)$row["comentarios"],
+            "autor" => [
+                "id" => (int)$row["ut_id"],
+                "nome" => $row["ut_nome"],
+            ],
+        ],
+    ]);
+}
+
+if ($resource === "forum" && $action === "comentarios" && $method === "GET") {
+    $postId = (int)$id;
+    if ($postId <= 0) {
+        $respond(["success" => false, "message" => "Publicação inválida."], 400);
+    }
+
+    $stmt = $mysqli->prepare(
+        "SELECT
+            c.com_id,
+            c.com_conteudo,
+            c.com_data,
+            u.ut_id,
+            u.ut_nome
+        FROM comentario c
+        INNER JOIN utilizador u ON u.ut_id = c.com_ut_id
+        WHERE c.com_post_id = ?
+        ORDER BY c.com_data ASC"
+    );
+    if (!$stmt) {
+        $respond(["success" => false, "message" => "Erro ao preparar comentários."], 500);
+    }
+
+    $stmt->bind_param("i", $postId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $comments = [];
+    while ($row = $result ? $result->fetch_assoc() : null) {
+        $comments[] = [
+            "id" => (int)$row["com_id"],
+            "conteudo" => $row["com_conteudo"],
+            "data" => $row["com_data"],
+            "autor" => [
+                "id" => (int)$row["ut_id"],
+                "nome" => $row["ut_nome"],
+            ],
+        ];
+    }
+    $stmt->close();
+
+    $respond([
+        "success" => true,
+        "data" => $comments,
+    ]);
+}
+
+if ($resource === "forum" && $action === "comentar" && $method === "POST") {
+    $postId = (int)$id;
+    $utId = (int)($body["ut_id"] ?? $body["usuario_id"] ?? 0);
+    $conteudo = trim((string)($body["conteudo"] ?? ""));
+
+    if ($postId <= 0) {
+        $respond(["success" => false, "message" => "Publicação inválida."], 400);
+    }
+    if ($utId <= 0) {
+        $respond(["success" => false, "message" => "Utilizador inválido."], 401);
+    }
+    if ($conteudo === "") {
+        $respond(["success" => false, "message" => "Comentário vazio."], 400);
+    }
+
+    $stmt = $mysqli->prepare("INSERT INTO comentario (com_post_id, com_ut_id, com_conteudo) VALUES (?, ?, ?)");
+    if (!$stmt) {
+        $respond(["success" => false, "message" => "Erro ao preparar comentário."], 500);
+    }
+
+    $stmt->bind_param("iis", $postId, $utId, $conteudo);
+    $success = $stmt->execute();
+    $commentId = (int)$mysqli->insert_id;
+    $stmt->close();
+
+    if (!$success) {
+        $respond(["success" => false, "message" => "Erro ao guardar comentário."], 500);
+    }
+
+    $respond([
+        "success" => true,
+        "message" => "Comentário enviado com sucesso!",
+        "data" => [
+            "id" => $commentId,
+        ],
+    ], 201);
+}
+
+if ($resource === "forum" && $action === "publicar" && $method === "POST") {
+    $utId = (int)($body["ut_id"] ?? $body["usuario_id"] ?? 0);
+    $titulo = trim((string)($body["titulo"] ?? ""));
+    $conteudo = trim((string)($body["conteudo"] ?? ""));
+    $categoria = trim((string)($body["categoria"] ?? "outros"));
+
+    if ($utId <= 0) {
+        $respond(["success" => false, "message" => "Utilizador inválido."], 401);
+    }
+    if ($titulo === "") {
+        $respond(["success" => false, "message" => "Título obrigatório."], 400);
+    }
+    if ($conteudo === "") {
+        $respond(["success" => false, "message" => "Conteúdo obrigatório."], 400);
+    }
+
+    $stmt = $mysqli->prepare("INSERT INTO post (post_ut_id, post_titulo, post_conteudo, post_categoria) VALUES (?, ?, ?, ?)");
+    if (!$stmt) {
+        $respond(["success" => false, "message" => "Erro ao preparar publicação."], 500);
+    }
+
+    $stmt->bind_param("isss", $utId, $titulo, $conteudo, $categoria);
+    $success = $stmt->execute();
+    $postId = (int)$mysqli->insert_id;
+    $stmt->close();
+
+    if (!$success) {
+        $respond(["success" => false, "message" => "Erro ao publicar tópico."], 500);
+    }
+
+    $respond([
+        "success" => true,
+        "message" => "Tópico publicado com sucesso!",
+        "data" => [
+            "id" => $postId,
+        ],
+    ], 201);
 }
 
 $respond(["success" => false, "message" => "Endpoint não encontrado."], 404);
