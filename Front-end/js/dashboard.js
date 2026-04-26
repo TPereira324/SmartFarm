@@ -38,6 +38,79 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    const weatherCodeToText = (code) => {
+        const n = Number(code);
+        if (!Number.isFinite(n)) return 'Sem descrição';
+        if (n === 0) return 'Céu limpo';
+        if ([1, 2, 3].includes(n)) return 'Parcialmente nublado';
+        if ([45, 48].includes(n)) return 'Nevoeiro';
+        if ([51, 53, 55, 56, 57].includes(n)) return 'Chuvisco';
+        if ([61, 63, 65, 66, 67].includes(n)) return 'Chuva';
+        if ([71, 73, 75, 77].includes(n)) return 'Neve';
+        if ([80, 81, 82].includes(n)) return 'Aguaceiros';
+        if ([95, 96, 99].includes(n)) return 'Trovoada';
+        return 'Tempo variável';
+    };
+
+    const fetchWeatherFromOpenMeteo = async (city) => {
+        const name = String(city || '').trim() || 'Lisboa';
+        const geoUrl = new URL('https://geocoding-api.open-meteo.com/v1/search');
+        geoUrl.searchParams.set('name', name);
+        geoUrl.searchParams.set('count', '1');
+        geoUrl.searchParams.set('language', 'pt');
+        geoUrl.searchParams.set('format', 'json');
+
+        const geoRes = await fetch(geoUrl.toString());
+        const geoData = await geoRes.json().catch(() => null);
+        const place = geoData?.results?.[0];
+        const latitude = Number(place?.latitude);
+        const longitude = Number(place?.longitude);
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+
+        const forecastUrl = new URL('https://api.open-meteo.com/v1/forecast');
+        forecastUrl.searchParams.set('latitude', String(latitude));
+        forecastUrl.searchParams.set('longitude', String(longitude));
+        forecastUrl.searchParams.set('current', 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code');
+        forecastUrl.searchParams.set('daily', 'temperature_2m_max,temperature_2m_min');
+        forecastUrl.searchParams.set('timezone', 'auto');
+
+        const forecastRes = await fetch(forecastUrl.toString());
+        const forecastData = await forecastRes.json().catch(() => null);
+        const current = forecastData?.current || null;
+        const daily = forecastData?.daily || null;
+        if (!current) return null;
+
+        const cityLabel = place?.name || name;
+        const tempMax = Array.isArray(daily?.temperature_2m_max) ? daily.temperature_2m_max[0] : null;
+        const tempMin = Array.isArray(daily?.temperature_2m_min) ? daily.temperature_2m_min[0] : null;
+
+        return {
+            cidade: cityLabel,
+            temperatura: current.temperature_2m,
+            sensacao_termica: current.apparent_temperature,
+            humidade: current.relative_humidity_2m,
+            temp_max: tempMax,
+            temp_min: tempMin,
+            descricao: weatherCodeToText(current.weather_code),
+            fonte: 'open-meteo',
+        };
+    };
+
+    const fetchWeather = async (city) => {
+        const cityName = String(city || '').trim() || 'Lisboa';
+        try {
+            const response = await api.fetchJson(`clima?cidade=${encodeURIComponent(cityName)}`);
+            const clima = response?.data || null;
+            if (clima) return clima;
+        } catch { }
+
+        try {
+            return await fetchWeatherFromOpenMeteo(cityName);
+        } catch {
+            return null;
+        }
+    };
+
     const formatArea = (value) => {
         const amount = Number(value || 0);
         return `${amount.toFixed(2)} m²`;
@@ -55,17 +128,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     try {
-        const [parcelasResponse, tarefasResponse, alertasResponse, climaResponse] = await Promise.all([
+        const [parcelasResponse, tarefasResponse, alertasResponse, clima] = await Promise.all([
             api.fetchJson(`parcelas/listar/${user.id}`),
             fetchOptional(`tarefas/listar/${user.id}`),
             fetchOptional(`alertas/listar/${user.id}`),
-            fetchOptional('clima?cidade=Lisboa'),
+            fetchWeather('Lisboa'),
         ]);
 
         const parcelas = Array.isArray(parcelasResponse?.data) ? parcelasResponse.data : [];
         const tarefas = Array.isArray(tarefasResponse?.data) ? tarefasResponse.data : [];
         const alertas = Array.isArray(alertasResponse?.data) ? alertasResponse.data : [];
-        const clima = climaResponse?.data || null;
 
         if (parcelasCount) parcelasCount.textContent = String(parcelas.length);
         if (tarefasCount) tarefasCount.textContent = String(tarefas.length);

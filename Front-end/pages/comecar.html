@@ -23,48 +23,7 @@
             </div>
         </div>
 
-        <div class="modulos-grid">
-            <a href="comecar-modulo.html?mod=1" class="modulo-card" id="mod-1">
-                <div class="modulo-card-img img-ph" style="overflow:hidden;padding:0;">
-                    <img src="../image/planta.jpeg" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="modulo-card-lines">
-                    <div style="font-weight:900;">Módulo 1</div>
-                    <div style="color:var(--muted);">Introdução</div>
-                </div>
-                <div class="modulo-status-icon" style="color:var(--muted);font-weight:800;">→</div>
-            </a>
-            <a href="comecar-modulo.html?mod=2" class="modulo-card locked" id="mod-2">
-                <div class="modulo-card-img img-ph" style="overflow:hidden;padding:0;">
-                    <img src="../image/Coco.jpeg" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="modulo-card-lines">
-                    <div style="font-weight:900;">Módulo 2</div>
-                    <div style="color:var(--muted);">Preparação do substrato</div>
-                </div>
-                <div class="modulo-status-icon" style="color:var(--muted);font-weight:800;">🔒</div>
-            </a>
-            <a href="comecar-modulo.html?mod=3" class="modulo-card locked" id="mod-3">
-                <div class="modulo-card-img img-ph" style="overflow:hidden;padding:0;">
-                    <img src="../image/planta.jpeg" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="modulo-card-lines">
-                    <div style="font-weight:900;">Módulo 3</div>
-                    <div style="color:var(--muted);">Plantio e rega</div>
-                </div>
-                <div class="modulo-status-icon" style="color:var(--muted);font-weight:800;">🔒</div>
-            </a>
-            <a href="comecar-modulo.html?mod=4" class="modulo-card locked" id="mod-4">
-                <div class="modulo-card-img img-ph" style="overflow:hidden;padding:0;">
-                    <img src="../image/Coco.jpeg" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="modulo-card-lines">
-                    <div style="font-weight:900;">Módulo 4</div>
-                    <div style="color:var(--muted);">Manutenção</div>
-                </div>
-                <div class="modulo-status-icon" style="color:var(--muted);font-weight:800;">🔒</div>
-            </a>
-        </div>
+        <div class="modulos-grid" id="modules-grid"></div>
 
         <style>
             .modulo-card.locked {
@@ -82,6 +41,15 @@
             (function() {
                 const user = JSON.parse(localStorage.getItem('user'));
                 const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+                const modules = {
+                    1: { title: 'Introdução', img: '../image/planta.jpeg' },
+                    2: { title: 'Preparação do substrato', img: '../image/Coco.jpeg' },
+                    3: { title: 'Plantio e rega', img: '../image/planta.jpeg' },
+                    4: { title: 'Manutenção', img: '../image/Coco.jpeg' },
+                };
+                const moduleEntries = Object.entries(modules)
+                    .map(([k, v]) => ({ id: Number(k), ...v }))
+                    .sort((a, b) => a.id - b.id);
 
                 // Add notice for non-logged users
                 if (!user) {
@@ -100,42 +68,43 @@
                     grid.parentNode.insertBefore(notice, grid.nextSibling);
                 }
 
-                // Unlock Module 2 if 1 is completed
-                if (completedModules.includes(1)) {
-                    const mod2 = document.getElementById('mod-2');
-                    mod2.classList.remove('locked');
-                    mod2.querySelector('.modulo-status-icon').textContent = '→';
-                    document.getElementById('mod-1').classList.add('completed');
-                    document.getElementById('mod-1').querySelector('.modulo-status-icon').textContent = '✓';
-                }
-                
-                // Unlock Module 3 if 2 is completed
-                if (completedModules.includes(2)) {
-                    const mod3 = document.getElementById('mod-3');
-                    mod3.classList.remove('locked');
-                    mod3.querySelector('.modulo-status-icon').textContent = '→';
-                    document.getElementById('mod-2').classList.add('completed');
-                    document.getElementById('mod-2').querySelector('.modulo-status-icon').textContent = '✓';
-                }
+                const grid = document.getElementById('modules-grid');
+                if (grid) {
+                    grid.innerHTML = '';
+                    moduleEntries.forEach((module) => {
+                        const isCompleted = completedModules.includes(module.id);
+                        const isUnlocked = module.id === 1 || completedModules.includes(module.id - 1);
+                        const isLocked = !isUnlocked;
 
-                // Unlock Module 4 if 3 is completed
-                if (completedModules.includes(3)) {
-                    const mod4 = document.getElementById('mod-4');
-                    mod4.classList.remove('locked');
-                    mod4.querySelector('.modulo-status-icon').textContent = '→';
-                    document.getElementById('mod-3').classList.add('completed');
-                    document.getElementById('mod-3').querySelector('.modulo-status-icon').textContent = '✓';
-                }
+                        const a = document.createElement('a');
+                        a.href = `comecar-modulo.html?mod=${module.id}`;
+                        a.className = 'modulo-card' + (isLocked ? ' locked' : '') + (isCompleted ? ' completed' : '');
+                        a.id = `mod-${module.id}`;
 
-                if (completedModules.includes(4)) {
-                    document.getElementById('mod-4').classList.add('completed');
-                    document.getElementById('mod-4').querySelector('.modulo-status-icon').textContent = '✓';
+                        const icon = isCompleted ? '✓' : (isLocked ? '🔒' : '→');
+
+                        a.innerHTML = `
+                            <div class="modulo-card-img img-ph" style="overflow:hidden;padding:0;">
+                                <img src="${module.img}" style="width:100%;height:100%;object-fit:cover;" alt="${module.title}">
+                            </div>
+                            <div class="modulo-card-lines">
+                                <div style="font-weight:900;">Módulo ${module.id}</div>
+                                <div style="color:var(--muted);">${module.title}</div>
+                            </div>
+                            <div class="modulo-status-icon" style="color:var(--muted);font-weight:800;">${icon}</div>
+                        `;
+
+                        grid.appendChild(a);
+                    });
                 }
 
                 // Update progress bar
-                const progress = (completedModules.length / 4) * 100;
-                document.querySelector('.progress-fill').style.width = progress + '%';
-                document.querySelector('.guia-progress span:last-child').textContent = Math.round(progress) + '%';
+                const total = moduleEntries.length || 1;
+                const progress = (completedModules.length / total) * 100;
+                const fill = document.querySelector('.progress-fill');
+                if (fill) fill.style.width = progress + '%';
+                const label = document.querySelector('.guia-progress span:last-child');
+                if (label) label.textContent = Math.round(progress) + '%';
             })();
         </script>
 

@@ -43,25 +43,8 @@
                 style="font-size:12px;font-weight:900;letter-spacing:0.2px;text-transform:uppercase;margin-bottom:12px;color:rgba(27,27,27,0.78);">
                 Materiais Necessários</div>
             <div class="materiais-grid">
-                <ul class="materiais-list">
-                    <li>
-                        <div class="bullet"></div>
-                        <div style="flex:1;">Balde / recipiente</div>
-                    </li>
-                    <li>
-                        <div class="bullet"></div>
-                        <div style="flex:1;">Medidor de pH/EC (opcional)</div>
-                    </li>
-                    <li>
-                        <div class="bullet"></div>
-                        <div style="flex:1;">Regador / sistema de rega</div>
-                    </li>
-                    <li>
-                        <div class="bullet"></div>
-                        <div style="flex:1;">Luvas e tesoura</div>
-                    </li>
-                </ul>
-                <div class="img-ph" style="height:160px;overflow:hidden;padding:0;">
+                <ul class="materiais-list" id="module-materials"></ul>
+                <div class="img-ph" id="module-materials-img" style="height:160px;overflow:hidden;padding:0;">
 
                 </div>
             </div>
@@ -111,6 +94,12 @@
                         { title: 'Medir humidade', description: 'Comece com valores base para ajustar a rega.' },
                         { title: 'Registar no painel', description: 'Salve medições e notas para acompanhamento.' },
                     ],
+                    materials: [
+                        'Balde / recipiente',
+                        'Medidor de pH/EC (opcional)',
+                        'Regador / sistema de rega',
+                        'Luvas e tesoura',
+                    ],
                 },
                 2: {
                     title: 'Preparação do substrato',
@@ -120,6 +109,12 @@
                         { title: 'Lavar e drenar', description: 'Reduza excesso de sais e garanta boa drenagem.' },
                         { title: 'Ajustar pH/EC (opcional)', description: 'Meça e ajuste conforme o tipo de cultivo.' },
                         { title: 'Preparar mistura final', description: 'Combine componentes e deixe pronto para o plantio.' },
+                    ],
+                    materials: [
+                        'Fibra de coco (bloco ou solta)',
+                        'Água limpa',
+                        'Peneira ou saco de drenagem',
+                        'Medidor de pH/EC (opcional)',
                     ],
                 },
                 3: {
@@ -131,6 +126,12 @@
                         { title: 'Regar no arranque', description: 'Faça uma primeira rega controlada para assentar o substrato.' },
                         { title: 'Definir rotina de rega', description: 'Ajuste a frequência com base na humidade e clima.' },
                     ],
+                    materials: [
+                        'Mudas ou sementes',
+                        'Substrato preparado',
+                        'Regador / sistema de rega',
+                        'Marcadores (opcional)',
+                    ],
                 },
                 4: {
                     title: 'Manutenção',
@@ -140,6 +141,12 @@
                         { title: 'Acompanhar nutrientes', description: 'Observe sinais e ajuste a adubação quando necessário.' },
                         { title: 'Controlar pragas/doenças', description: 'Inspecione folhas e aplique medidas preventivas.' },
                         { title: 'Registar evolução', description: 'Guarde notas e fotos para comparar resultados.' },
+                    ],
+                    materials: [
+                        'Caderno/telemóvel para registos',
+                        'Tesoura de poda',
+                        'Pulverizador (opcional)',
+                        'Adubo conforme a cultura (opcional)',
                     ],
                 },
             };
@@ -158,6 +165,8 @@
             const finishBtn = document.getElementById('finish-module');
             const statusEl = document.getElementById('modulo-status');
             const stepsRoot = document.getElementById('module-steps');
+            const materialsRoot = document.getElementById('module-materials');
+            const materialsImg = document.getElementById('module-materials-img');
 
             const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -263,6 +272,23 @@
                 });
             };
 
+            const renderMaterials = () => {
+                const items = Array.isArray(current.materials) ? current.materials : [];
+                if (materialsRoot) {
+                    materialsRoot.innerHTML = '';
+                    items.forEach((text) => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<div class="bullet"></div><div style="flex:1;">${text}</div>`;
+                        materialsRoot.appendChild(li);
+                    });
+                }
+                if (materialsImg) {
+                    materialsImg.innerHTML = current.img
+                        ? `<img src="${current.img}" style="width:100%;height:100%;object-fit:cover;" alt="${current.title}">`
+                        : '';
+                }
+            };
+
             const syncButtons = () => {
                 const isCompleted = completedModules.includes(mod);
                 if (finishBtn) {
@@ -281,6 +307,7 @@
             };
 
             renderSteps();
+            renderMaterials();
             renderStatus();
             syncButtons();
 
