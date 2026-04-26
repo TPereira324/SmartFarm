@@ -1,6 +1,8 @@
 class UtilizadorModel {
     async register(userData) {
-        const endpoint = new URL('../../Back-end/registrar.php', window.location.href).toString();
+        const endpoint = window.CocoRootApi
+            ? window.CocoRootApi.buildPhpUrl('registrar.php')
+            : new URL('../../Back-end/registrar.php', window.location.href).toString();
         try {
             const response = await fetch(endpoint, {
                 method: 'POST',

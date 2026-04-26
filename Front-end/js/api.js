@@ -1,6 +1,27 @@
 (() => {
-    const backendBaseUrl = new URL('../../Back-end/', window.location.href);
-    const apiBaseUrl = new URL('api.php/', backendBaseUrl);
+    // ---------------------------------------------------------------
+    // CONFIGURAÇÃO MAMP PRO  (porta 80 — lido do httpd.conf)
+    const MAMP_PORT = 80;
+    // ---------------------------------------------------------------
+
+    // URL base do Apache MAMP (sem barra final)
+    const mampOrigin = MAMP_PORT === 80
+        ? 'http://localhost'
+        : 'http://localhost:' + MAMP_PORT;
+
+    // Calcula o path relativo do backend a partir do URL atual da página.
+    // Ex: se a página está em /Front-end/pages/login.html,
+    // o backend está em /Back-end/ (dois níveis acima + Back-end/)
+    const rawBackend = new URL('../../Back-end/', window.location.href);
+
+    // Se a página NÃO está a ser servida pelo Apache do MAMP,
+    // substitui o origin pelo MAMP, mantendo o mesmo path.
+    const servedByMamp = rawBackend.origin === mampOrigin
+        || rawBackend.origin === 'http://localhost:80'
+        || rawBackend.origin === 'http://localhost';
+
+    const backendBaseUrl = (servedByMamp ? rawBackend.origin : mampOrigin) + rawBackend.pathname;
+    const apiBaseUrl     = backendBaseUrl + 'api.php/';
 
     function buildBackendUrl(path = '') {
         return new URL(String(path).replace(/^\/+/, ''), apiBaseUrl).toString();

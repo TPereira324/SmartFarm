@@ -1,6 +1,7 @@
 -- ============================================
 -- POPULATE
 -- ============================================
+USE coco_db;
 
 -- CIDADE
 INSERT INTO cidade (cid_nome) VALUES
@@ -11,12 +12,13 @@ INSERT INTO cidade (cid_nome) VALUES
 ('Braga');
 
 -- UTILIZADOR
+-- Todos os utilizadores de teste têm a password: password123
 INSERT INTO utilizador (ut_nome, ut_email, ut_password, ut_nome_fazenda, ut_agricultor_iniciante) VALUES
-('João Silva', 'joao@email.com', 'hashed_password_1', 'Quinta do João', FALSE),
-('Maria Santos', 'maria@email.com', 'hashed_password_2', 'Horta da Maria', TRUE),
-('Carlos Ferreira', 'carlos@email.com', 'hashed_password_3', 'Fazenda Ferreira', FALSE),
-('Ana Oliveira', 'ana@email.com', 'hashed_password_4', 'Verde Vivo', TRUE),
-('Rui Costa', 'rui@email.com', 'hashed_password_5', 'Campos do Rui', FALSE);
+('João Silva',     'joao@email.com',   '$2y$10$69/qilvw.uNrEKdllldOjO23JJwResJm4WVTmwfJ/TWQn6fyk8rIG', 'Quinta do João',   FALSE),
+('Maria Santos',   'maria@email.com',  '$2y$10$69/qilvw.uNrEKdllldOjO23JJwResJm4WVTmwfJ/TWQn6fyk8rIG', 'Horta da Maria',   TRUE),
+('Carlos Ferreira','carlos@email.com', '$2y$10$69/qilvw.uNrEKdllldOjO23JJwResJm4WVTmwfJ/TWQn6fyk8rIG', 'Fazenda Ferreira', FALSE),
+('Ana Oliveira',   'ana@email.com',    '$2y$10$69/qilvw.uNrEKdllldOjO23JJwResJm4WVTmwfJ/TWQn6fyk8rIG', 'Verde Vivo',       TRUE),
+('Rui Costa',      'rui@email.com',    '$2y$10$69/qilvw.uNrEKdllldOjO23JJwResJm4WVTmwfJ/TWQn6fyk8rIG', 'Campos do Rui',    FALSE);
 
 -- CULTIVO
 INSERT INTO cultivo (cult_nome, cult_descricao) VALUES
@@ -100,11 +102,11 @@ INSERT INTO notificacao (not_ut_id, not_mensagem, not_lida) VALUES
 
 -- POST (Comunidade)
 INSERT INTO post (post_ut_id, post_titulo, post_conteudo, post_categoria) VALUES
-(1, 'Como aumentar a produção de morangos?', 'Tenho usado fibra de coco há 3 meses e os resultados são incríveis. Alguém tem dicas para aumentar ainda mais a produção?', 'Dúvidas Técnicas'),
-(2, 'A minha experiência com hidroponia', 'Comecei há 6 meses sem saber nada. Hoje produzo alface para a família toda. Partilho aqui o meu percurso.', 'Experiências'),
-(3, 'Problema com míldio no tomate', 'Apareceram manchas brancas nas folhas do tomate. Já alguém passou por isto? Como resolveram?', 'Dúvidas Técnicas'),
-(4, 'História de Sucesso: Morangos em Fibra de Coco', 'Em apenas 2 meses consegui os primeiros frutos. O segredo foi controlar bem a rega e usar substrato de qualidade.', 'História de Sucesso'),
-(5, 'Dica: manjericão em vasos pequenos', 'Descobri que o manjericão cresce melhor em vasos de barro do que em plástico. Partilho a minha experiência.', 'Experiências');
+(1, 'Como aumentar a produção de morangos?', 'Tenho usado fibra de coco há 3 meses e os resultados são incríveis. Alguém tem dicas para aumentar ainda mais a produção?', 'duvidas'),
+(2, 'A minha experiência com hidroponia', 'Comecei há 6 meses sem saber nada. Hoje produzo alface para a família toda. Partilho aqui o meu percurso.', 'experiencias'),
+(3, 'Problema com míldio no tomate', 'Apareceram manchas brancas nas folhas do tomate. Já alguém passou por isto? Como resolveram?', 'duvidas'),
+(4, 'História de Sucesso: Morangos em Fibra de Coco', 'Em apenas 2 meses consegui os primeiros frutos. O segredo foi controlar bem a rega e usar substrato de qualidade.', 'dicas'),
+(5, 'Dica: manjericão em vasos pequenos', 'Descobri que o manjericão cresce melhor em vasos de barro do que em plástico. Partilho a minha experiência.', 'experiencias');
 
 -- COMENTARIO
 INSERT INTO comentario (com_post_id, com_ut_id, com_conteudo) VALUES

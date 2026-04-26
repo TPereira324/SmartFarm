@@ -390,6 +390,90 @@ if ($resource === "forum" && $action === "comentar" && $method === "POST") {
     ], 201);
 }
 
+if ($resource === "tarefas" && $action === "listar" && $method === "GET") {
+    $utId = $id !== null ? (int)$id : (int)($_GET["ut_id"] ?? 0);
+    if ($utId <= 0) {
+        $respond(["success" => false, "message" => "ut_id inválido."], 400);
+    }
+
+    $stmt = $mysqli->prepare(
+        "SELECT
+            t.tar_id,
+            t.tar_titulo,
+            t.tar_descricao,
+            t.tar_data_inicio,
+            t.tar_data_fim,
+            t.tar_estado,
+            t.tar_prioridade,
+            p.par_nome AS parcela_nome
+        FROM tarefa t
+        LEFT JOIN parcela p ON p.par_id = t.tar_par_id
+        WHERE t.tar_ut_id = ?
+        ORDER BY t.tar_data_inicio ASC"
+    );
+    if (!$stmt) {
+        $respond(["success" => false, "message" => "Erro ao preparar query de tarefas."], 500);
+    }
+    $stmt->bind_param("i", $utId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $tarefas = [];
+    while ($row = $result ? $result->fetch_assoc() : null) {
+        $tarefas[] = [
+            "id"           => (int)$row["tar_id"],
+            "titulo"       => $row["tar_titulo"],
+            "descricao"    => $row["tar_descricao"],
+            "data_inicio"  => $row["tar_data_inicio"],
+            "data_fim"     => $row["tar_data_fim"],
+            "estado"       => $row["tar_estado"],
+            "prioridade"   => $row["tar_prioridade"],
+            "parcela_nome" => $row["parcela_nome"],
+        ];
+    }
+    $stmt->close();
+
+    $respond(["success" => true, "data" => $tarefas]);
+}
+
+if ($resource === "alertas" && $action === "listar" && $method === "GET") {
+    $utId = $id !== null ? (int)$id : (int)($_GET["ut_id"] ?? 0);
+    if ($utId <= 0) {
+        $respond(["success" => false, "message" => "ut_id inválido."], 400);
+    }
+
+    $stmt = $mysqli->prepare(
+        "SELECT
+            a.alt_id,
+            a.alt_tipo,
+            a.alt_mensagem,
+            a.alt_data,
+            p.par_nome AS parcela_nome
+        FROM alerta a
+        INNER JOIN parcela p ON p.par_id = a.alt_par_id
+        WHERE p.par_ut_id = ?
+        ORDER BY a.alt_data DESC"
+    );
+    if (!$stmt) {
+        $respond(["success" => false, "message" => "Erro ao preparar query de alertas."], 500);
+    }
+    $stmt->bind_param("i", $utId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $alertas = [];
+    while ($row = $result ? $result->fetch_assoc() : null) {
+        $alertas[] = [
+            "id"           => (int)$row["alt_id"],
+            "tipo"         => $row["alt_tipo"],
+            "mensagem"     => $row["alt_mensagem"],
+            "data"         => $row["alt_data"],
+            "parcela_nome" => $row["parcela_nome"],
+        ];
+    }
+    $stmt->close();
+
+    $respond(["success" => true, "data" => $alertas]);
+}
+
 if ($resource === "forum" && $action === "publicar" && $method === "POST") {
     $utId = (int)($body["ut_id"] ?? $body["usuario_id"] ?? 0);
     $titulo = trim((string)($body["titulo"] ?? ""));

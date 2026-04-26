@@ -83,6 +83,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
     };
 
+    const publishToggleBtn = document.getElementById('publish-toggle-btn');
+    const publishFormSection = document.getElementById('publish-form-section');
+    const publishForm = document.getElementById('community-publish-form');
+    const publishCancelBtn = document.getElementById('publish-cancel-btn');
+    const publishSubmitBtn = document.getElementById('publish-submit-btn');
+    const publishErrorEl = document.getElementById('publish-error');
+
+    const setPublishError = (message) => {
+        if (!publishErrorEl) return;
+        publishErrorEl.hidden = !message;
+        publishErrorEl.textContent = message || '';
+    };
+
+    const openPublishForm = () => {
+        if (publishFormSection) publishFormSection.hidden = false;
+        if (publishToggleBtn) publishToggleBtn.hidden = true;
+    };
+
+    const closePublishForm = () => {
+        if (publishFormSection) publishFormSection.hidden = true;
+        if (publishToggleBtn) publishToggleBtn.hidden = false;
+        if (publishForm) publishForm.reset();
+        setPublishError('');
+    };
+
+    publishToggleBtn?.addEventListener('click', openPublishForm);
+    publishCancelBtn?.addEventListener('click', closePublishForm);
+
+    publishForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const user = api.getLoggedUser();
+        if (!user?.id) {
+            setPublishError('Precisas de iniciar sessão para publicar.');
+            return;
+        }
+
+        const titulo = String(document.getElementById('publish-titulo')?.value || '').trim();
+        const conteudo = String(document.getElementById('publish-conteudo')?.value || '').trim();
+        const categoria = String(document.getElementById('publish-categoria')?.value || 'outros');
+
+        if (!titulo) { setPublishError('O título é obrigatório.'); return; }
+        if (!conteudo) { setPublishError('O conteúdo é obrigatório.'); return; }
+
+        try {
+            setPublishError('');
+            if (publishSubmitBtn) publishSubmitBtn.disabled = true;
+            await api.fetchJson('forum/publicar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ut_id: user.id, titulo, conteudo, categoria }),
+            });
+            closePublishForm();
+            const response = await api.fetchJson('forum/listar');
+            posts = Array.isArray(response?.data) ? response.data : [];
+            renderStats(posts);
+            renderPosts(posts, currentCategory);
+        } catch (error) {
+            setPublishError(error.message || 'Não foi possível publicar.');
+        } finally {
+            if (publishSubmitBtn) publishSubmitBtn.disabled = false;
+        }
+    });
+
     let currentCategory = 'todos';
     let posts = [];
 
@@ -95,6 +158,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabs.forEach((tab) => {
         tab.addEventListener('click', () => activateTab(tab.dataset.cat));
     });
+
+    const user = api.getLoggedUser();
+    if (user?.id && publishToggleBtn) publishToggleBtn.hidden = false;
 
     try {
         const response = await api.fetchJson('forum/listar');
