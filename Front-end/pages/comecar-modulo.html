@@ -36,37 +36,7 @@
         <div
             style="font-size:12px;font-weight:900;letter-spacing:0.2px;text-transform:uppercase;margin-bottom:12px;color:rgba(27,27,27,0.78);">
             Passo a Passo</div>
-        <ul class="step-checklist">
-            <li>
-                <div class="step-check done">✓</div>
-                <div style="flex:1;">
-                    <div style="font-weight:900;margin-bottom:4px;">Preparar o espaço de trabalho</div>
-                    <div style="color:var(--muted);line-height:1.6;">Organize materiais e assegure ventilação e limpeza.
-                    </div>
-                </div>
-            </li>
-            <li>
-                <div class="step-check done">✓</div>
-                <div style="flex:1;">
-                    <div style="font-weight:900;margin-bottom:4px;">Verificar drenagem</div>
-                    <div style="color:var(--muted);line-height:1.6;">Garanta escoamento e retenção equilibrados.</div>
-                </div>
-            </li>
-            <li>
-                <div class="step-check"></div>
-                <div style="flex:1;">
-                    <div style="font-weight:900;margin-bottom:4px;">Medir humidade</div>
-                    <div style="color:var(--muted);line-height:1.6;">Comece com valores base para ajustar a rega.</div>
-                </div>
-            </li>
-            <li>
-                <div class="step-check"></div>
-                <div style="flex:1;">
-                    <div style="font-weight:900;margin-bottom:4px;">Registrar no painel</div>
-                    <div style="color:var(--muted);line-height:1.6;">Salve medições e notas para acompanhamento.</div>
-                </div>
-            </li>
-        </ul>
+        <ul class="step-checklist" id="module-steps"></ul>
 
         <div style="margin-top:26px;">
             <div
@@ -109,7 +79,8 @@
             const user = JSON.parse(localStorage.getItem('user'));
             const params = new URLSearchParams(window.location.search);
             const mod = parseInt(params.get('mod') || '1', 10);
-            const completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+            let completedModules = JSON.parse(localStorage.getItem('completedModules') || '[]');
+            const progressKey = 'cocoRootModuleProgress';
 
             if (!user) {
                 const pageContent = document.querySelector('.page-content');
@@ -131,10 +102,46 @@
             }
 
             const modules = {
-                1: { title: 'Introdução', img: '../image/planta.jpeg' },
-                2: { title: 'Preparação do substrato', img: '../image/Coco.jpeg' },
-                3: { title: 'Plantio e rega', img: '../image/planta.jpeg' },
-                4: { title: 'Manutenção', img: '../image/Coco.jpeg' },
+                1: {
+                    title: 'Introdução',
+                    img: '../image/planta.jpeg',
+                    steps: [
+                        { title: 'Preparar o espaço de trabalho', description: 'Organize materiais e assegure ventilação e limpeza.' },
+                        { title: 'Verificar drenagem', description: 'Garanta escoamento e retenção equilibrados.' },
+                        { title: 'Medir humidade', description: 'Comece com valores base para ajustar a rega.' },
+                        { title: 'Registar no painel', description: 'Salve medições e notas para acompanhamento.' },
+                    ],
+                },
+                2: {
+                    title: 'Preparação do substrato',
+                    img: '../image/Coco.jpeg',
+                    steps: [
+                        { title: 'Hidratar a fibra de coco', description: 'Deixe a fibra expandir com água limpa antes de usar.' },
+                        { title: 'Lavar e drenar', description: 'Reduza excesso de sais e garanta boa drenagem.' },
+                        { title: 'Ajustar pH/EC (opcional)', description: 'Meça e ajuste conforme o tipo de cultivo.' },
+                        { title: 'Preparar mistura final', description: 'Combine componentes e deixe pronto para o plantio.' },
+                    ],
+                },
+                3: {
+                    title: 'Plantio e rega',
+                    img: '../image/planta.jpeg',
+                    steps: [
+                        { title: 'Escolher recipiente/área', description: 'Defina o local e o tipo de vaso/parcela.' },
+                        { title: 'Plantar corretamente', description: 'Respeite profundidade e espaçamento recomendados.' },
+                        { title: 'Regar no arranque', description: 'Faça uma primeira rega controlada para assentar o substrato.' },
+                        { title: 'Definir rotina de rega', description: 'Ajuste a frequência com base na humidade e clima.' },
+                    ],
+                },
+                4: {
+                    title: 'Manutenção',
+                    img: '../image/Coco.jpeg',
+                    steps: [
+                        { title: 'Monitorizar humidade', description: 'Verifique regularmente para evitar excesso ou falta de água.' },
+                        { title: 'Acompanhar nutrientes', description: 'Observe sinais e ajuste a adubação quando necessário.' },
+                        { title: 'Controlar pragas/doenças', description: 'Inspecione folhas e aplique medidas preventivas.' },
+                        { title: 'Registar evolução', description: 'Guarde notas e fotos para comparar resultados.' },
+                    ],
+                },
             };
             const current = modules[mod] || modules[1];
             document.getElementById('modulo-kicker').textContent = 'MÓDULO ' + (modules[mod] ? mod : 1);
@@ -149,32 +156,159 @@
             const next = mod + 1;
             const nextBtn = document.getElementById('next-module');
             const finishBtn = document.getElementById('finish-module');
+            const statusEl = document.getElementById('modulo-status');
+            const stepsRoot = document.getElementById('module-steps');
 
-            // Check if already completed
-            if (completedModules.includes(mod)) {
-                finishBtn.style.display = 'none';
-                if (modules[next]) {
-                    nextBtn.style.display = 'inline-block';
-                    nextBtn.setAttribute('href', 'comecar-modulo.html?mod=' + next);
+            const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
+            const readProgressStore = () => {
+                try {
+                    const raw = localStorage.getItem(progressKey);
+                    return raw ? JSON.parse(raw) : {};
+                } catch {
+                    return {};
                 }
-                document.getElementById('modulo-status').textContent = '● Concluído';
-                document.getElementById('modulo-status').style.color = 'var(--primary)';
+            };
+
+            const writeProgressStore = (store) => {
+                localStorage.setItem(progressKey, JSON.stringify(store || {}));
+            };
+
+            const userId = String(user.id ?? 'anon');
+            const store = readProgressStore();
+            const userProgress = (store[userId] && typeof store[userId] === 'object') ? store[userId] : {};
+            const totalSteps = Array.isArray(current.steps) ? current.steps.length : 0;
+            let progress = clamp(Number(userProgress[String(mod)] || 0), 0, totalSteps);
+            if (completedModules.includes(mod)) {
+                progress = totalSteps;
+                userProgress[String(mod)] = progress;
+                store[userId] = userProgress;
+                writeProgressStore(store);
             }
 
+            const renderStatus = () => {
+                const isCompleted = completedModules.includes(mod);
+                if (!statusEl) return;
+                if (isCompleted) {
+                    statusEl.textContent = '● Concluído';
+                    statusEl.style.color = 'var(--primary)';
+                    return;
+                }
+                statusEl.textContent = `● Em curso (${progress}/${totalSteps})`;
+                statusEl.style.color = 'rgba(27,27,27,0.74)';
+            };
+
+            const renderSteps = () => {
+                if (!stepsRoot) return;
+                stepsRoot.innerHTML = '';
+                const steps = Array.isArray(current.steps) ? current.steps : [];
+                steps.forEach((step, idx) => {
+                    const stepNumber = idx + 1;
+                    const isDone = stepNumber <= progress;
+                    const isActive = stepNumber === progress + 1 && progress < totalSteps;
+
+                    const li = document.createElement('li');
+                    li.dataset.step = String(stepNumber);
+                    li.tabIndex = 0;
+                    li.classList.toggle('active-step', isActive);
+
+                    const check = document.createElement('div');
+                    check.className = 'step-check' + (isDone ? ' done' : '');
+                    check.textContent = isDone ? '✓' : '';
+
+                    const body = document.createElement('div');
+                    body.style.flex = '1';
+
+                    const title = document.createElement('div');
+                    title.style.fontWeight = '900';
+                    title.style.marginBottom = '4px';
+                    title.textContent = step?.title || `Passo ${stepNumber}`;
+
+                    const desc = document.createElement('div');
+                    desc.style.color = 'var(--muted)';
+                    desc.style.lineHeight = '1.6';
+                    desc.textContent = step?.description || '';
+
+                    body.appendChild(title);
+                    body.appendChild(desc);
+
+                    li.appendChild(check);
+                    li.appendChild(body);
+
+                    const selectStep = () => {
+                        if (completedModules.includes(mod)) {
+                            progress = totalSteps;
+                            renderSteps();
+                            renderStatus();
+                            return;
+                        }
+                        progress = clamp(stepNumber, 0, totalSteps);
+                        userProgress[String(mod)] = progress;
+                        store[userId] = userProgress;
+                        writeProgressStore(store);
+                        renderSteps();
+                        renderStatus();
+                        if (finishBtn) finishBtn.disabled = progress < totalSteps;
+                    };
+
+                    li.addEventListener('click', selectStep);
+                    li.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            selectStep();
+                        }
+                    });
+
+                    stepsRoot.appendChild(li);
+                });
+            };
+
+            const syncButtons = () => {
+                const isCompleted = completedModules.includes(mod);
+                if (finishBtn) {
+                    finishBtn.style.display = 'inline-block';
+                    finishBtn.disabled = !isCompleted && progress < totalSteps;
+                    finishBtn.textContent = isCompleted ? 'Voltar ao Guia' : 'Concluir Módulo';
+                }
+                if (nextBtn) {
+                    if (isCompleted && modules[next]) {
+                        nextBtn.style.display = 'inline-block';
+                        nextBtn.setAttribute('href', 'comecar-modulo.html?mod=' + next);
+                    } else {
+                        nextBtn.style.display = 'none';
+                    }
+                }
+            };
+
+            renderSteps();
+            renderStatus();
+            syncButtons();
+
             finishBtn.addEventListener('click', () => {
+                if (completedModules.includes(mod)) {
+                    window.location.href = 'comecar.html';
+                    return;
+                }
+                if (progress < totalSteps) {
+                    alert('Conclua todos os passos antes de finalizar o módulo.');
+                    return;
+                }
                 const completed = JSON.parse(localStorage.getItem('completedModules') || '[]');
                 if (!completed.includes(mod)) {
                     completed.push(mod);
                     localStorage.setItem('completedModules', JSON.stringify(completed));
                 }
+                completedModules = completed;
 
-                finishBtn.style.display = 'none';
-                if (modules[next]) {
-                    nextBtn.style.display = 'inline-block';
-                    nextBtn.setAttribute('href', 'comecar-modulo.html?mod=' + next);
-                }
-                document.getElementById('modulo-status').textContent = '● Concluído';
-                document.getElementById('modulo-status').style.color = 'var(--primary)';
+                progress = totalSteps;
+                userProgress[String(mod)] = progress;
+                store[userId] = userProgress;
+                writeProgressStore(store);
+
+                renderStatus();
+                syncButtons();
+
+                window.location.href = 'comecar.html';
             });
 
             document.title = 'Módulo ' + (modules[mod] ? mod : 1) + ' - CocoRoot';

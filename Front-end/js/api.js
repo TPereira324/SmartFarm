@@ -9,10 +9,17 @@
         ? 'http://localhost'
         : 'http://localhost:' + MAMP_PORT;
 
+    const isFileProtocol = window.location.protocol === 'file:';
+
     // Calcula o path relativo do backend a partir do URL atual da página.
     // Ex: se a página está em /Front-end/pages/login.html,
     // o backend está em /Back-end/ (dois níveis acima + Back-end/)
-    const rawBackend = new URL('../../Back-end/', window.location.href);
+    //
+    // Em file:// o pathname vira algo como /C:/... e não é um path válido no Apache.
+    // Nesse caso, assume que o backend está disponível no Apache em /Back-end/.
+    const rawBackend = isFileProtocol
+        ? new URL(mampOrigin + '/Back-end/')
+        : new URL('../../Back-end/', window.location.href);
 
     // Se a página NÃO está a ser servida pelo Apache do MAMP,
     // substitui o origin pelo MAMP, mantendo o mesmo path.
@@ -20,7 +27,8 @@
         || rawBackend.origin === 'http://localhost:80'
         || rawBackend.origin === 'http://localhost';
 
-    const backendBaseUrl = (servedByMamp ? rawBackend.origin : mampOrigin) + rawBackend.pathname;
+    const backendPath = isFileProtocol ? '/Back-end/' : rawBackend.pathname;
+    const backendBaseUrl = (servedByMamp ? rawBackend.origin : mampOrigin) + backendPath;
     const apiBaseUrl     = backendBaseUrl + 'api.php/';
 
     function buildBackendUrl(path = '') {
