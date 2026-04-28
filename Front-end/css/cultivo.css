@@ -11,7 +11,7 @@
     gap: 16px;
     margin-bottom: 28px;
     padding-bottom: 18px;
-    border-bottom: 3px solid #222;
+    border-bottom: 1px solid rgba(47, 111, 59, 0.14);
     flex-wrap: wrap;
 }
 
@@ -34,17 +34,20 @@
     display: flex;
     gap: 8px;
     align-items: center;
+    width: 100%;
+    max-width: 420px;
 }
 
 .cultivo-stepper-dot {
-    width: 34px;
+    flex: 1;
     height: 6px;
-    border: 2px solid #222;
-    background: #fff;
+    border: 0;
+    background: rgba(47, 143, 61, 0.16);
+    border-radius: 999px;
 }
 
 .cultivo-stepper-dot.active {
-    background: #222;
+    background: rgba(47, 143, 61, 0.92);
 }
 
 .cultivo-step {
@@ -56,8 +59,11 @@
 }
 
 .cultivo-card {
-    border: 2px solid #222;
+    border: 1px solid rgba(47, 111, 59, 0.14);
     padding: 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
 }
 
 .field-row {
@@ -74,7 +80,7 @@
 }
 
 .field-unit {
-    border: 3px solid #222;
+    border: 1px solid rgba(47, 111, 59, 0.18);
     padding: 14px 16px;
     font-size: 13px;
     font-weight: bold;
@@ -83,6 +89,8 @@
     height: 53px;
     display: flex;
     align-items: center;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.96);
 }
 
 .cultivo-actions {
@@ -106,6 +114,7 @@
     font-weight: bold;
     letter-spacing: 1px;
     margin-bottom: 14px;
+    border-radius: 14px;
 }
 
 .cultivo-summary {
