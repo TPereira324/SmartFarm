@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const metaEl = document.getElementById('c-meta');
     const bodyEl = document.getElementById('c-body');
     const commentsEl = document.getElementById('community-comments');
+    const commentsTitleEl = document.getElementById('community-comments-title');
     const errorEl = document.getElementById('community-post-error');
     const form = document.getElementById('community-comment-form');
     const textarea = document.getElementById('community-comment-input');
@@ -35,19 +36,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const renderComments = (comments) => {
         if (!commentsEl) return;
+        if (commentsTitleEl) {
+            commentsTitleEl.textContent = `${Array.isArray(comments) ? comments.length : 0} Respostas`;
+        }
         if (!Array.isArray(comments) || comments.length === 0) {
             commentsEl.innerHTML = '<div class="card"><div style="color:var(--muted);line-height:1.6;">Ainda não existem respostas para esta publicação.</div></div>';
             return;
         }
 
         commentsEl.innerHTML = comments.map((comment) => `
-            <div class="comment-item">
-                <div class="comment-avatar"></div>
-                <div class="comment-lines">
-                    <div style="font-weight:800;margin-bottom:4px;">${comment?.autor?.nome || 'Utilizador'}</div>
-                    <div style="color:var(--muted);margin-bottom:4px;">${formatDate(comment.data)}</div>
-                    <div style="color:var(--muted);line-height:1.6;">${comment.conteudo || ''}</div>
-                </div>
+            <div class="community-reply">
+                <div class="community-reply-avatar"><i class="bi bi-person" aria-hidden="true"></i></div>
+                <div class="community-reply-text">${comment.conteudo || ''}</div>
+                <div class="community-reply-like"><i class="bi bi-heart" aria-hidden="true"></i></div>
             </div>
         `).join('');
     };
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (titleEl) titleEl.textContent = post.titulo || 'Sem título';
             if (badgeEl) badgeEl.textContent = post.categoria_label || 'Outro';
-            if (metaEl) metaEl.textContent = `${post?.autor?.nome || 'Utilizador'} · ${formatDate(post.data)}`;
+            if (metaEl) metaEl.textContent = `${post?.autor?.nome || 'Utilizador'}`;
             if (bodyEl) bodyEl.textContent = post.conteudo || 'Sem conteúdo.';
             document.title = `${post.titulo || 'Publicação'} - CocoRoot`;
 

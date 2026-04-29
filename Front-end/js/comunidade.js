@@ -71,14 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         postsRoot.innerHTML = filtered.map((post) => `
-            <a class="card" data-cat="${post.categoria || 'outros'}" href="comunidade-post.html?id=${post.id}" style="text-decoration:none;color:inherit;display:block;">
-                <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
-                    <div style="font-weight:900;">${post?.autor?.nome || 'Utilizador'}</div>
-                    <div style="color:var(--muted);font-size:13px;">${formatRelativeMeta(post)}</div>
+            <a class="community-post" data-cat="${post.categoria || 'outros'}" href="comunidade-post.html?id=${post.id}">
+                <div class="community-post-top">
+                    <div class="community-post-user">${post?.autor?.nome || 'Utilizador'}</div>
+                    <div class="community-post-time">${formatRelativeMeta(post)}</div>
                 </div>
-                <div style="font-weight:900;font-size:16px;margin-bottom:6px;">${post.titulo || 'Sem título'}</div>
-                <div style="color:var(--muted);line-height:1.6;">${post.conteudo || 'Sem conteúdo.'}</div>
-                <div class="post-badge">${post.categoria_label || 'Outro'}</div>
+                <div class="community-post-title">${post.titulo || 'Sem título'}</div>
+                <div class="community-post-excerpt">${post.conteudo || 'Sem conteúdo.'}</div>
+                <div class="post-badge ${post.categoria || 'outros'}">${post.categoria_label || 'Outro'}</div>
             </a>
         `).join('');
     };

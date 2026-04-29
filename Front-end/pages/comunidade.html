@@ -9,55 +9,58 @@
 </head>
 
 <body class="app-page">
-
-
     <div class="page-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
-            <div class="page-title" style="margin-bottom:0;">Rede de Agricultores</div>
-            <button id="publish-toggle-btn" class="btn" type="button" hidden>+ Nova Publicação</button>
-        </div>
-
-        <div id="community-error" class="dash-card" style="margin-bottom:16px;color:#8a1f11;" hidden></div>
-
-        <div id="publish-form-section" style="margin-bottom:18px;" hidden>
-            <div class="dash-card">
-                <div class="dash-card-title" style="margin-bottom:14px;">Nova Publicação</div>
-                <div id="publish-error" style="color:#8a1f11;margin-bottom:10px;" hidden></div>
-                <form id="community-publish-form">
-                    <div class="form-group">
-                        <label for="publish-titulo">Título</label>
-                        <input type="text" id="publish-titulo" placeholder="Título da publicação..." required>
-                    </div>
-                    <div class="form-group">
-                        <label for="publish-conteudo">Conteúdo</label>
-                        <textarea id="publish-conteudo" rows="4" placeholder="Escreve aqui..." style="resize:vertical;width:100%;box-sizing:border-box;"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="publish-categoria">Categoria</label>
-                        <select id="publish-categoria" class="btn" style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
-                            <option value="duvidas">Dúvida</option>
-                            <option value="dicas">Dica</option>
-                            <option value="experiencias">Experiência</option>
-                        </select>
-                    </div>
-                    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;">
-                        <button type="button" id="publish-cancel-btn" class="btn">Cancelar</button>
-                        <button type="submit" id="publish-submit-btn" class="btn">Publicar</button>
-                    </div>
-                </form>
+        <section class="community-shell">
+            <div class="community-head">
+                <div class="community-title">Comunidade</div>
+                <div class="community-subtitle">Rede de agricultores</div>
+                <div class="community-divider"></div>
             </div>
-        </div>
 
-        <div id="community-stats" class="stats-row" aria-label="Estatísticas"></div>
+            <div id="community-error" class="dash-card" style="margin-bottom:16px;color:#8a1f11;" hidden></div>
 
-        <div class="tabs" role="tablist" aria-label="Categorias">
-            <button class="tab active" type="button" data-cat="todos">Todos</button>
-            <button class="tab" type="button" data-cat="duvidas">Dúvidas</button>
-            <button class="tab" type="button" data-cat="dicas">Dicas</button>
-            <button class="tab" type="button" data-cat="experiencias">Experiências</button>
-        </div>
+            <div id="publish-form-section" style="margin-bottom:18px;" hidden>
+                <div class="dash-card">
+                    <div class="dash-card-title" style="margin-bottom:14px;">Nova Publicação</div>
+                    <div id="publish-error" style="color:#8a1f11;margin-bottom:10px;" hidden></div>
+                    <form id="community-publish-form">
+                        <div class="form-group">
+                            <label for="publish-titulo">Título</label>
+                            <input type="text" id="publish-titulo" placeholder="Título da publicação..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="publish-conteudo">Conteúdo</label>
+                            <textarea id="publish-conteudo" rows="4" placeholder="Escreve aqui..."
+                                style="resize:vertical;width:100%;box-sizing:border-box;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="publish-categoria">Categoria</label>
+                            <select id="publish-categoria" class="btn"
+                                style="width:100%;text-align:left;letter-spacing:1px;text-transform:none;font-weight:bold;">
+                                <option value="duvidas">Dúvida</option>
+                                <option value="dicas">Dica</option>
+                                <option value="experiencias">Experiência</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:10px;">
+                            <button type="button" id="publish-cancel-btn" class="btn">Cancelar</button>
+                            <button type="submit" id="publish-submit-btn" class="btn">Publicar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-        <div id="posts" style="display:flex;flex-direction:column;gap:12px;"></div>
+            <div id="community-stats" class="stats-row" aria-label="Estatísticas"></div>
+
+            <div class="tabs" role="tablist" aria-label="Categorias">
+                <button class="tab active" type="button" data-cat="todos">Todos</button>
+                <button class="tab" type="button" data-cat="duvidas">Dúvidas</button>
+                <button class="tab" type="button" data-cat="dicas">Dicas</button>
+                <button class="tab" type="button" data-cat="experiencias">Experiências</button>
+            </div>
+
+            <div id="posts" class="community-posts"></div>
+        </section>
     </div>
 
     <script src="../js/api.js"></script>
