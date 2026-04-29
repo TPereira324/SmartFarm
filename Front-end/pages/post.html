@@ -1,60 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artigo - CocoRoot</title>
     <link rel="stylesheet" href="../css/cocoroot.css">
 </head>
+
 <body class="app-page">
-    
-
-    <div class="page-content" style="max-width:820px;">
-        <div style="margin-bottom:18px;">
-            <a href="noticias.html" class="back-link">← Voltar às Notícias</a>
-        </div>
-
-        <div class="detalhe-actions">
-            <div class="article-heart" id="post-like" aria-label="Adicionar aos favoritos">
-                <button type="button" aria-label="Favoritar"><i class="bi bi-heart" aria-hidden="true"></i></button>
+    <div class="page-content news-detail-page">
+        <section class="news-shell">
+            <div class="news-head">
+                <div class="news-title">Notícias e Artigos</div>
+                <div class="news-subtitle">Mantenha-se atualizado com dicas e histórias da comunidade</div>
+                <div class="news-divider"></div>
             </div>
-            <div class="article-heart" id="post-share" aria-label="Partilhar">
-                <button type="button" aria-label="Partilhar"><i class="bi bi-share" aria-hidden="true"></i></button>
-            </div>
-        </div>
 
-        <h1 id="post-title" style="font-size:34px;letter-spacing:-0.6px;line-height:1.15;margin-bottom:10px;">Como iniciar a produção de fibra de coco</h1>
-        <div id="post-meta" style="color:var(--muted);margin-bottom:22px;">21/03/26 • 8 min</div>
-
-        <div class="detalhe-img img-ph" style="overflow:hidden;padding:0;">
-            
-        </div>
-
-        <div id="post-body" style="display:flex;flex-direction:column;gap:12px;line-height:1.75;color:rgba(27,27,27,0.82);">
-            <p>Começar a produção de fibra de coco é mais simples quando existe um processo claro. O objetivo é obter um substrato consistente, bem drenado e estável.</p>
-            <p>Antes de avançar, define o teu método de preparação e garante que tens os materiais essenciais. O controlo de humidade e a drenagem são críticos para evitar problemas nas primeiras semanas.</p>
-            <p>Com uma rotina bem definida, consegues reduzir desperdício, aumentar a uniformidade e melhorar a produtividade ao longo do tempo.</p>
-        </div>
-
-        <div class="comments-section">
-            <div class="comment-title">Comentários</div>
-
-            <div class="comment-item">
-                <div class="comment-avatar"></div>
-                <div class="comment-lines">
-                    <div style="font-weight:800;margin-bottom:4px;">Produtor</div>
-                    <div style="color:var(--muted);line-height:1.6;">Gostei do passo a passo. Vou aplicar já na próxima preparação.</div>
+            <div class="news-detail-titlebar">
+                <h1 id="post-title" class="news-detail-title">Como Maximizar a Produção de Morangos em Fibra de Coco
+                </h1>
+                <div class="detalhe-actions">
+                    <div class="article-heart" id="post-share" aria-label="Partilhar">
+                        <button type="button" aria-label="Partilhar"><i class="bi bi-share"
+                                aria-hidden="true"></i></button>
+                    </div>
+                    <div class="article-heart" id="post-like" aria-label="Adicionar aos favoritos">
+                        <button type="button" aria-label="Favoritar"><i class="bi bi-heart"
+                                aria-hidden="true"></i></button>
+                    </div>
                 </div>
             </div>
 
-            <div class="comment-item">
-                <div class="comment-avatar"></div>
-                <div class="comment-lines">
-                    <div style="font-weight:800;margin-bottom:4px;">CocoRoot</div>
-                    <div style="color:var(--muted);line-height:1.6;">Se quiseres, segue o guia “Preparação do substrato” em Começar do Zero.</div>
-                </div>
+            <div class="detalhe-img img-ph"></div>
+
+            <div class="news-detail-body">
+                <div id="post-body" class="news-article-copy"></div>
+                <a href="noticias.html" class="news-more">ler mais...</a>
             </div>
-        </div>
+        </section>
     </div>
 
     <script>
@@ -62,19 +46,44 @@
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id') || '1';
             const data = {
-                '1': { title: 'Como iniciar a produção de fibra de coco', meta: '21/03/26 • 8 min', img: '../image/planta.jpeg' },
-                '2': { title: 'Tendências de mercado para 2026', meta: '20/03/26 • 5 min', img: '../image/Coco.jpeg' },
-                '3': { title: 'Substrato de fibra de coco: erros comuns', meta: '18/03/26 • 6 min', img: '../image/planta.jpeg' },
-                '4': { title: 'Rega e drenagem: como acertar no ponto', meta: '15/03/26 • 7 min', img: '../image/Coco.jpeg' },
+                '1': {
+                    title: 'Como Maximizar a Produção de Morangos em Fibra de Coco',
+                    img: '../image/planta.jpeg',
+                    body: 'Cultivar morangos usando técnicas de hidroponia oferece uma maneira única de desfrutar de frutas frescas e saborosas durante todo o ano. Este método acelera o crescimento das plantas e aumenta a produção em comparação com o cultivo tradicional no solo. Você também pode cultivar morangos em ambientes internos ou em espaços pequenos, o que o torna perfeito para iniciantes. Sistema Hidropônico Utilizamos água de forma eficiente, reduzindo o desperdício e promovendo a sustentabilidade. Ao adotar essa abordagem, você contribui para práticas ecologicamente corretas e, ao mesmo tempo, desfruta da satisfação de cultivar seus próprios alimentos.'
+                },
+                '2': {
+                    title: 'Novidades: Sistema de Monitorização Automática Disponível',
+                    img: '../image/Coco.jpeg',
+                    body: 'A CocoRoot lança um novo sistema de monitorização automática pensado para agricultores que precisam de acompanhar humidade, temperatura e comportamento do substrato ao longo do dia. A novidade permite mais controlo, decisões mais rápidas e menos desperdício de recursos. Com relatórios simples e alertas em tempo real, o processo torna-se mais previsível e eficiente.'
+                },
+                '3': {
+                    title: 'História de Sucesso: Agricultor Duplica Produção em 6 Meses',
+                    img: '../image/planta.jpeg',
+                    body: 'Pedro Costa começou com uma pequena área experimental e, ao adaptar corretamente a drenagem, o plano de rega e a rotina de acompanhamento, conseguiu duplicar a produção em apenas seis meses. O caso mostra como pequenas melhorias operacionais, aliadas a dados consistentes, podem transformar uma exploração agrícola e criar uma operação mais estável e rentável.'
+                },
+                '4': {
+                    title: 'Preparação do Substrato: Erros Comuns e Como Evitá-los',
+                    img: '../image/Coco.jpeg',
+                    body: 'A preparação do substrato continua a ser uma das etapas mais críticas no arranque do cultivo em fibra de coco. Erros simples, como excesso de água, drenagem deficiente ou falta de uniformidade na hidratação, comprometem o desempenho da plantação. Com um processo bem definido, é possível garantir estabilidade, melhor absorção de nutrientes e maior previsibilidade no desenvolvimento das culturas.'
+                },
+                '5': {
+                    title: 'Comunidade CocoRoot Recebe Novos Guias Interativos',
+                    img: '../image/planta.jpeg',
+                    body: 'Os novos guias interativos da CocoRoot foram desenvolvidos para simplificar tarefas e ajudar produtores em diferentes estágios de aprendizagem. O objetivo é criar um percurso prático, visual e fácil de seguir, com recomendações úteis, passos claros e conteúdos diretamente aplicáveis ao dia a dia de quem trabalha com substrato de fibra de coco.'
+                }
             };
             const post = data[id] || data['1'];
             document.getElementById('post-title').textContent = post.title;
-            document.getElementById('post-meta').textContent = post.meta;
             document.title = post.title + ' - CocoRoot';
 
             const img = document.querySelector('.detalhe-img');
             if (img) {
                 img.innerHTML = `<img src="${post.img}" style="width:100%;height:100%;object-fit:cover;" alt="${post.title}">`;
+            }
+
+            const bodyRoot = document.getElementById('post-body');
+            if (bodyRoot) {
+                bodyRoot.textContent = post.body;
             }
 
             const key = 'cocoRootFavorites';
@@ -118,7 +127,8 @@
             }
 
             if (shareRoot) {
-                shareRoot.addEventListener('click', async (e) => {
+                const shareBtn = shareRoot.querySelector('button');
+                (shareBtn || shareRoot).addEventListener('click', async (e) => {
                     e.preventDefault();
                     const url = window.location.href;
                     try {
@@ -137,6 +147,7 @@
             }
         })();
     </script>
-<script src="../js/layout.js"></script>
+    <script src="../js/layout.js"></script>
 </body>
+
 </html>

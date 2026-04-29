@@ -1,83 +1,35 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Notícias - CocoRoot</title>
     <link rel="stylesheet" href="../css/cocoroot.css">
 </head>
+
 <body class="app-page">
-    
-
     <div class="page-content">
-        <div class="page-title">Notícias e Artigos</div>
+        <section class="news-shell">
+            <div class="news-head">
+                <div class="news-title">Notícias e Artigos</div>
+                <div class="news-subtitle">Mantenha-se atualizado com dicas e histórias da comunidade</div>
+                <div class="news-divider"></div>
+            </div>
 
-        <div class="filter-tabs" role="tablist" aria-label="Filtros">
-            <button class="filter-tab active" type="button">Todos (4)</button>
-            <button class="filter-tab" type="button">Produção (2)</button>
-            <button class="filter-tab" type="button">Mercado (1)</button>
-            <button class="filter-tab" type="button">Dicas (1)</button>
-        </div>
+            <div class="news-stats" id="news-stats"></div>
 
-        <div class="article-list">
-            <a class="article-item" href="post.html?id=1" style="text-decoration:none;color:inherit;">
-                <div class="article-img img-ph" style="overflow:hidden;padding:0;">
-                    
-                </div>
-                <div class="article-content">
-                    <div style="font-weight:900;font-size:16px;margin-bottom:6px;">Como iniciar a produção de fibra de coco</div>
-                    <div class="article-meta">
-                        <span>21/03/26</span>
-                        <span>8 min</span>
-                    </div>
-                </div>
-                <div class="article-heart" data-id="1"><button type="button" aria-label="Favoritar"><i class="bi bi-heart" aria-hidden="true"></i></button></div>
-            </a>
+            <div class="news-filters" role="tablist" aria-label="Filtros">
+                <button class="news-filter active" type="button" data-filter="all">Todos</button>
+                <button class="news-filter" type="button" data-filter="news">Novidades</button>
+                <button class="news-filter" type="button" data-filter="tips">Dicas Técnicas</button>
+                <button class="news-filter" type="button" data-filter="stories">Histórias</button>
+            </div>
 
-            <a class="article-item" href="post.html?id=2" style="text-decoration:none;color:inherit;">
-                <div class="article-img img-ph" style="overflow:hidden;padding:0;">
-                    
-                </div>
-                <div class="article-content">
-                    <div style="font-weight:900;font-size:16px;margin-bottom:6px;">Tendências de mercado para 2026</div>
-                    <div class="article-meta">
-                        <span>20/03/26</span>
-                        <span>5 min</span>
-                    </div>
-                </div>
-                <div class="article-heart" data-id="2"><button type="button" aria-label="Favoritar"><i class="bi bi-heart" aria-hidden="true"></i></button></div>
-            </a>
-
-            <a class="article-item" href="post.html?id=3" style="text-decoration:none;color:inherit;">
-                <div class="article-img img-ph" style="overflow:hidden;padding:0;">
-                    
-                </div>
-                <div class="article-content">
-                    <div style="font-weight:900;font-size:16px;margin-bottom:6px;">Substrato de fibra de coco: erros comuns</div>
-                    <div class="article-meta">
-                        <span>18/03/26</span>
-                        <span>6 min</span>
-                    </div>
-                </div>
-                <div class="article-heart" data-id="3"><button type="button" aria-label="Favoritar"><i class="bi bi-heart" aria-hidden="true"></i></button></div>
-            </a>
-
-            <a class="article-item" href="post.html?id=4" style="text-decoration:none;color:inherit;">
-                <div class="article-img img-ph" style="overflow:hidden;padding:0;">
-                    
-                </div>
-                <div class="article-content">
-                    <div style="font-weight:900;font-size:16px;margin-bottom:6px;">Rega e drenagem: como acertar no ponto</div>
-                    <div class="article-meta">
-                        <span>15/03/26</span>
-                        <span>7 min</span>
-                    </div>
-                </div>
-                <div class="article-heart" data-id="4"><button type="button" aria-label="Favoritar"><i class="bi bi-heart" aria-hidden="true"></i></button></div>
-            </a>
-        </div>
+            <div class="article-list" id="article-list"></div>
+        </section>
     </div>
-<script src="../js/layout.js"></script>
+    <script src="../js/layout.js"></script>
     <script>
         (function () {
             const key = 'cocoRootFavorites';
@@ -91,21 +43,108 @@
             };
             const write = (list) => localStorage.setItem(key, JSON.stringify(list || []));
             const favorites = new Set(read().map(String));
+            const articles = [
+                {
+                    id: '1',
+                    category: 'tips',
+                    label: 'Dicas Técnicas',
+                    title: 'Como Maximizar a Produção de Morangos em Fibra de Coco',
+                    excerpt: 'Descubra as melhores práticas para cultivar morangos saudáveis e produtivos usando substrato de fibra de coco.',
+                    date: '02/03/2026',
+                    image: '../image/planta.jpeg'
+                },
+                {
+                    id: '2',
+                    category: 'news',
+                    label: 'Novidades',
+                    title: 'Novidades: Sistema de Monitorização Automática Disponível',
+                    excerpt: 'A plataforma COCOROOT agora oferece monitorização em tempo real com sensores inteligentes.',
+                    date: '01/03/2026',
+                    image: '../image/Coco.jpeg'
+                },
+                {
+                    id: '3',
+                    category: 'stories',
+                    label: 'Histórias de Agricultores',
+                    title: 'História de Sucesso: Agricultor Duplica Produção em 6 Meses',
+                    excerpt: 'Conheça a jornada de Pedro Costa que transformou sua pequena horta numa operação sustentável e lucrativa.',
+                    date: '28/02/2026',
+                    image: '../image/planta.jpeg'
+                },
+                {
+                    id: '4',
+                    category: 'tips',
+                    label: 'Dicas Técnicas',
+                    title: 'Preparação do Substrato: Erros Comuns e Como Evitá-los',
+                    excerpt: 'Pequenos ajustes na hidratação e drenagem fazem grande diferença na estabilidade da fibra de coco.',
+                    date: '24/02/2026',
+                    image: '../image/Coco.jpeg'
+                },
+                {
+                    id: '5',
+                    category: 'news',
+                    label: 'Novidades',
+                    title: 'Comunidade CocoRoot Recebe Novos Guias Interativos',
+                    excerpt: 'Os novos módulos trazem acompanhamento passo a passo para agricultores iniciantes e experientes.',
+                    date: '20/02/2026',
+                    image: '../image/planta.jpeg'
+                }
+            ];
 
-            const items = Array.from(document.querySelectorAll('.article-heart[data-id]'));
-            items.forEach((root) => {
-                const id = String(root.getAttribute('data-id') || '');
-                if (!id) return;
-                const btn = root.querySelector('button');
-                const icon = root.querySelector('i');
-                const sync = () => {
-                    const liked = favorites.has(id);
-                    root.classList.toggle('is-liked', liked);
-                    if (icon) icon.className = liked ? 'bi bi-heart-fill' : 'bi bi-heart';
-                    if (btn) btn.setAttribute('aria-label', liked ? 'Remover dos favoritos' : 'Adicionar aos favoritos');
-                };
-                sync();
-                if (btn) {
+            const statsRoot = document.getElementById('news-stats');
+            const listRoot = document.getElementById('article-list');
+            const filters = Array.from(document.querySelectorAll('.news-filter[data-filter]'));
+            let activeFilter = 'all';
+
+            const renderStats = () => {
+                const total = articles.length;
+                const newsCount = articles.filter((item) => item.category === 'news').length;
+                const tipsCount = articles.filter((item) => item.category === 'tips').length;
+                const favCount = articles.filter((item) => favorites.has(item.id)).length;
+                const stats = [
+                    { value: total, label: 'Total de Artigos' },
+                    { value: newsCount, label: 'Novidades' },
+                    { value: tipsCount, label: 'Dicas Técnicas' },
+                    { value: favCount, label: 'Favoritos' }
+                ];
+                statsRoot.innerHTML = stats.map((item) => `
+                    <div class="news-stat">
+                        <div class="news-stat-value">${item.value}</div>
+                        <div class="news-stat-label">${item.label}</div>
+                    </div>
+                `).join('');
+            };
+
+            const renderArticles = () => {
+                const filtered = activeFilter === 'all'
+                    ? articles.slice(0, 3)
+                    : articles.filter((item) => item.category === activeFilter).slice(0, 3);
+
+                listRoot.innerHTML = filtered.map((article) => `
+                    <a class="article-item" href="post.html?id=${article.id}">
+                        <div class="article-img img-ph">
+                            <img src="${article.image}" alt="${article.title}" style="width:100%;height:100%;object-fit:cover;">
+                        </div>
+                        <div class="article-content">
+                            <div class="article-tag ${article.category === 'stories' ? 'story' : ''}">${article.label}</div>
+                            <div class="article-title">${article.title}</div>
+                            <div class="article-excerpt">${article.excerpt}</div>
+                            <div class="article-meta"><i class="bi bi-calendar-event" aria-hidden="true"></i><span>${article.date}</span></div>
+                        </div>
+                        <div class="article-heart ${favorites.has(article.id) ? 'is-liked' : ''}" data-id="${article.id}">
+                            <button type="button" aria-label="${favorites.has(article.id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}">
+                                <i class="bi ${favorites.has(article.id) ? 'bi-heart-fill' : 'bi-heart'}" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </a>
+                `).join('');
+
+                const items = Array.from(document.querySelectorAll('.article-heart[data-id]'));
+                items.forEach((root) => {
+                    const id = String(root.getAttribute('data-id') || '');
+                    const btn = root.querySelector('button');
+                    const icon = root.querySelector('i');
+                    if (!btn || !icon || !id) return;
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -117,11 +156,24 @@
                             window.CocoRootToast && window.CocoRootToast('Favoritos', 'Adicionado aos favoritos');
                         }
                         write(Array.from(favorites));
-                        sync();
+                        renderStats();
+                        renderArticles();
                     });
-                }
+                });
+            };
+
+            filters.forEach((button) => {
+                button.addEventListener('click', () => {
+                    activeFilter = button.dataset.filter || 'all';
+                    filters.forEach((item) => item.classList.toggle('active', item === button));
+                    renderArticles();
+                });
             });
+
+            renderStats();
+            renderArticles();
         })();
     </script>
 </body>
+
 </html>
