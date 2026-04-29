@@ -7,90 +7,53 @@
     <link rel="stylesheet" href="../css/cocoroot.css">
 </head>
 <body class="app-page">
-    
-
     <div class="page-content">
-        <div class="page-title">Sobre nós</div>
+        <section class="about-shell">
+            <div class="about-head">
+                <div class="about-title">Sobre Nós</div>
+                <div class="about-subtitle">Conheça um pouco mais sobre esta iniciativa e quem está por trás</div>
+                <div class="about-divider"></div>
+            </div>
 
-        <div class="dash-card" style="margin-bottom:18px;">
-            <div class="dash-card-title">Quem somos</div>
-            <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:center;">
-                <div>
-                    <div style="font-weight:900;font-size:18px;margin-bottom:8px;">Agricultura inteligente para cultivo em fibra de coco.</div>
-                    <div style="color:var(--muted);line-height:1.7;">
-                        O CocoRoot ajuda produtores a gerir, monitorizar e otimizar explorações com foco em dados. Criamos uma experiência simples, prática e adequada ao dia a dia no campo.
-                    </div>
-                </div>
-                <div class="img-ph" style="height:180px;overflow:hidden;padding:0;">
-                    
-                </div>
+            <div class="about-box">
+                <div class="about-kicker">Quem somos</div>
+                <div class="about-strong">Plataforma digital para agricultura inteligente para cultivo em fibra de coco.</div>
+                <div class="about-text">O CocoRoot ajuda produtores a gerir, monitorizar e otimizar explorações com foco em dados. Criamos uma experiência simples, prática e adequada ao dia a dia no campo.</div>
             </div>
-        </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;">
-            <div class="card">
-                <div style="font-weight:900;margin-bottom:8px;">Missão</div>
-                <div style="color:var(--muted);line-height:1.7;">Ajudar agricultores a tomar decisões baseadas em dados, com ferramentas simples e claras.</div>
+            <div class="about-two">
+                <div class="about-card">
+                    <div class="about-card-title">MISSÃO</div>
+                    <div class="about-text">Ajudar agricultores a tomar decisões baseadas em dados, com ferramentas simples e claras.</div>
+                </div>
+                <div class="about-card">
+                    <div class="about-card-title">VISÃO</div>
+                    <div class="about-text">Tornar o cultivo em fibra de coco mais eficiente e sustentável, com apoio tecnológico acessível.</div>
+                </div>
             </div>
-            <div class="card">
-                <div style="font-weight:900;margin-bottom:8px;">Visão</div>
-                <div style="color:var(--muted);line-height:1.7;">Tornar o cultivo em fibra de coco mais eficiente e sustentável, com apoio tecnológico acessível.</div>
-            </div>
-        </div>
 
-        <div class="dash-card" style="margin-bottom:18px;">
-            <div class="dash-card-title">A nossa equipa</div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;">
-                <div class="card">
-                    <div style="font-weight:900;">Camila Vargas</div>
-                </div>
-                <div class="card">
-                    <div style="font-weight:900;">Fábio Teixeira</div>
-                </div>
-                <div class="card">
-                    <div style="font-weight:900;">Feliciano Barata</div>
-                </div>
-                <div class="card">
-                    <div style="font-weight:900;">Taha-Wur Pereira</div>
+            <div class="team-box">
+                <div class="team-head">A NOSSA EQUIPA</div>
+                <div class="team-grid">
+                    <div class="team-member">Camila Vargas</div>
+                    <div class="team-member">Fábio Teixeira</div>
+                    <div class="team-member">Feliciano Barata</div>
+                    <div class="team-member">Taha-Wur Pereira</div>
                 </div>
             </div>
-        </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <div class="dash-card">
-                <div class="dash-card-title">Redes sociais</div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <a href="#" style="text-decoration:none;color:rgba(27,27,27,0.86);font-weight:800;">Instagram</a>
-                    <a href="#" style="text-decoration:none;color:rgba(27,27,27,0.86);font-weight:800;">Facebook</a>
-                    <a href="#" style="text-decoration:none;color:rgba(27,27,27,0.86);font-weight:800;">LinkedIn</a>
+            <div class="about-bottom">
+                <div class="about-card">
+                    <div class="about-card-title">REDES SOCIAIS</div>
+                    <div class="about-text">Ajudar agricultores a tomar decisões baseadas em dados, com ferramentas simples e claras.</div>
+                </div>
+                <div class="about-card">
+                    <div class="about-card-title">ONDE COMPRAR O SUBSSTRATO</div>
+                    <div class="about-text">Tornar o cultivo em fibra de coco mais eficiente e sustentável, com apoio tecnológico acessível.</div>
                 </div>
             </div>
-            <div class="dash-card">
-                <div class="dash-card-title">Onde comprar</div>
-                <div style="display:flex;flex-direction:column;gap:10px;color:var(--muted);line-height:1.7;">
-                    <div>Distribuidor local</div>
-                    <div>Revenda agrícola</div>
-                    <div>Contacte-nos para parceiros</div>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
-
-    <script>
-        (function () {
-            const grid = document.querySelector('.page-content > .dash-card > div[style*=\"grid-template-columns:1.2fr\"]');
-            if (!grid) return;
-            function adjust() {
-                if (window.innerWidth < 860) {
-                    grid.style.gridTemplateColumns = '1fr';
-                } else {
-                    grid.style.gridTemplateColumns = '1.2fr 1fr';
-                }
-            }
-            adjust();
-            window.addEventListener('resize', adjust);
-        })();
-    </script>
 <script src="../js/layout.js"></script>
 </body>
 </html>
