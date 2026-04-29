@@ -97,8 +97,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const openPublishForm = () => {
+        const user = api.getLoggedUser();
+        if (!user?.id) {
+            setPublishError('Precisas de iniciar sessão para fazer perguntas ou partilhar dicas.');
+            setError('Precisas de iniciar sessão para participar na comunidade.');
+            if (window.CocoRootToast) {
+                window.CocoRootToast('Comunidade', 'Inicia sessão para publicar uma pergunta');
+            }
+            return;
+        }
         if (publishFormSection) publishFormSection.hidden = false;
         if (publishToggleBtn) publishToggleBtn.hidden = true;
+        document.getElementById('publish-titulo')?.focus();
     };
 
     const closePublishForm = () => {
@@ -158,9 +168,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     tabs.forEach((tab) => {
         tab.addEventListener('click', () => activateTab(tab.dataset.cat));
     });
-
-    const user = api.getLoggedUser();
-    if (user?.id && publishToggleBtn) publishToggleBtn.hidden = false;
 
     try {
         const response = await api.fetchJson('forum/listar');
