@@ -117,6 +117,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'Tempo variável';
     };
 
+    const weatherCodeToIcon = (code) => {
+        const n = Number(code);
+        if (!Number.isFinite(n)) return 'bi-cloud';
+        if (n === 0) return 'bi-sun';
+        if ([1, 2, 3].includes(n)) return 'bi-cloud-sun';
+        if ([45, 48].includes(n)) return 'bi-cloud-fog2';
+        if ([51, 53, 55, 56, 57].includes(n)) return 'bi-cloud-drizzle';
+        if ([61, 63, 65, 66, 67, 80, 81, 82].includes(n)) return 'bi-cloud-rain';
+        if ([71, 73, 75, 77].includes(n)) return 'bi-cloud-snow';
+        if ([95, 96, 99].includes(n)) return 'bi-cloud-lightning-rain';
+        return 'bi-cloud';
+    };
+
     const fetchWeatherFromOpenMeteo = async (city) => {
         const name = String(city || '').trim() || 'Lisboa';
         const geoUrl = new URL('https://geocoding-api.open-meteo.com/v1/search');
@@ -136,7 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         forecastUrl.searchParams.set('latitude', String(latitude));
         forecastUrl.searchParams.set('longitude', String(longitude));
         forecastUrl.searchParams.set('current', 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code');
-        forecastUrl.searchParams.set('daily', 'temperature_2m_max,temperature_2m_min');
+        forecastUrl.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max');
         forecastUrl.searchParams.set('timezone', 'auto');
 
         const forecastRes = await fetch(forecastUrl.toString());
@@ -148,6 +161,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cityLabel = place?.name || name;
         const tempMax = Array.isArray(daily?.temperature_2m_max) ? daily.temperature_2m_max[0] : null;
         const tempMin = Array.isArray(daily?.temperature_2m_min) ? daily.temperature_2m_min[0] : null;
+        const forecastDays = Array.isArray(daily?.time) ? daily.time.map((day, index) => ({
+            data: day,
+            weather_code: Array.isArray(daily?.weather_code) ? daily.weather_code[index] : null,
+            temp_max: Array.isArray(daily?.temperature_2m_max) ? daily.temperature_2m_max[index] : null,
+            temp_min: Array.isArray(daily?.temperature_2m_min) ? daily.temperature_2m_min[index] : null,
+            chuva_probabilidade: Array.isArray(daily?.precipitation_probability_max) ? daily.precipitation_probability_max[index] : null,
+            vento_max: Array.isArray(daily?.wind_speed_10m_max) ? daily.wind_speed_10m_max[index] : null,
+        })) : [];
 
         return {
             cidade: cityLabel,
@@ -157,6 +178,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             temp_max: tempMax,
             temp_min: tempMin,
             descricao: weatherCodeToText(current.weather_code),
+            weather_code: current.weather_code,
+            previsao: forecastDays,
             atualizado_em: current.time || null,
             fonte: 'open-meteo',
         };
@@ -420,6 +443,209 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </button>
             `;
         }).join('');
+    };
+
+    const formatWeekdayShort = (value) => {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return new Intl.DateTimeFormat('pt-PT', { weekday: 'short' })
+            .format(date)
+            .replace('.', '')
+            .replace(/^\w/, (m) => m.toUpperCase());
+    };
+
+    const pickFirstFinite = (sources, keys) => {
+        for (const source of sources) {
+            for (const key of keys) {
+                const value = Number(source?.[key]);
+                if (Number.isFinite(value)) return value;
+            }
+        }
+        return null;
+    };
+
+    const pickFirstText = (sources, keys) => {
+        for (const source of sources) {
+            for (const key of keys) {
+                const value = String(source?.[key] ?? '').trim();
+                if (value) return value;
+            }
+        }
+        return '';
+    };
+
+    const createMonitorMetric = ({ icon, label, value, detail, tone = 'neutral', available = false }) => `
+        <div class="monitor-card monitor-${tone} ${available ? '' : 'is-empty'}">
+            <div class="monitor-card-top">
+                <i class="bi ${icon}" aria-hidden="true"></i>
+                <span class="monitor-card-badge">${available ? 'leitura real' : 'sem sensor'}</span>
+            </div>
+            <div class="monitor-card-label">${label}</div>
+            <div class="monitor-card-value">${value}</div>
+            <div class="monitor-card-trend">${detail}</div>
+        </div>
+    `;
+
+    const renderMonitorizacao = (parcelas, clima, alertas) => {
+        if (!monitorizacaoContainer) return;
+        const list = Array.isArray(parcelas) ? parcelas : [];
+
+        if (list.length === 0) {
+            renderEmpty(monitorizacaoContainer, 'Registe parcelas para acompanhar a monitorização.');
+            return;
+        }
+
+        monitorizacaoContainer.innerHTML = `
+            <div class="monitor-accordion">
+                ${list.map((parcela, index) => {
+            const cultivos = Array.isArray(parcela?.cultivos) ? parcela.cultivos : [];
+            const cultivo = cultivos[0] || {};
+            const parcelaNome = parcela?.nome || `Parcela ${index + 1}`;
+            const cultivoNome = cultivo?.nome ? ` - ${cultivo.nome}` : '';
+            const area = Number(parcela?.area_m2 ?? parcela?.par_area);
+            const estado = String(parcela?.estado || parcela?.par_estado || '').trim() || 'Sem estado';
+            const metodo = pickFirstText([cultivo, parcela], ['metodo', 'pc_metodo_cultivo']);
+            const objetivo = pickFirstText([cultivo, parcela], ['objetivo', 'pc_objetivo']);
+            const ph = pickFirstFinite([cultivo, parcela], ['ph', 'ph_solo', 'phSolo']);
+            const ec = pickFirstFinite([cultivo, parcela], ['ec', 'condutividade', 'condutividade_eletrica']);
+            const humidade = pickFirstFinite([cultivo, parcela], ['humidade', 'humidade_solo', 'humidadeSolo']);
+            const temperatura = pickFirstFinite([cultivo, parcela], ['temperatura', 'temperatura_solo', 'temperaturaSolo']);
+            const hasAnyReading = [temperatura, humidade, ph, ec].some((value) => Number.isFinite(value));
+            const relatedAlerts = (Array.isArray(alertas) ? alertas : []).filter((alerta) => {
+                const where = String(alerta?.parcela_nome || alerta?.parcela || '');
+                return where && where.toLowerCase() === parcelaNome.toLowerCase();
+            }).length;
+            const meta = [
+                `Estado: ${estado}`,
+                Number.isFinite(area) ? `Área: ${formatArea(area)}` : '',
+                metodo ? `Método: ${metodo}` : '',
+                objetivo ? `Objetivo: ${objetivo}` : '',
+            ].filter(Boolean);
+
+            return `
+                    <section class="monitor-group ${index === 0 ? 'is-open' : ''}" data-monitor-group>
+                        <button type="button" class="monitor-group-toggle" data-monitor-toggle>
+                            <span class="monitor-group-info">
+                                <span class="monitor-group-title">${parcelaNome}${cultivoNome}</span>
+                                <span class="monitor-group-meta">${meta.join(' · ')}</span>
+                            </span>
+                            <span class="monitor-group-right">
+                                ${relatedAlerts > 0 ? `<span class="monitor-group-pill">${relatedAlerts} alerta${relatedAlerts > 1 ? 's' : ''}</span>` : ''}
+                                <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                            </span>
+                        </button>
+                        <div class="monitor-group-panel">
+                            <div class="monitor-cards-grid">
+                                ${createMonitorMetric({
+                icon: 'bi-thermometer-half',
+                label: 'Temperatura',
+                value: Number.isFinite(temperatura) ? `${Math.round(temperatura)}°C` : 'Sem leitura',
+                detail: Number.isFinite(temperatura) ? 'Leitura atual da parcela' : 'Sem temperatura registada para esta parcela',
+                tone: 'warm',
+                available: Number.isFinite(temperatura),
+            })}
+                                ${createMonitorMetric({
+                icon: 'bi-moisture',
+                label: 'Humidade',
+                value: Number.isFinite(humidade) ? `${Math.round(humidade)}%` : 'Sem leitura',
+                detail: Number.isFinite(humidade) ? 'Leitura atual da parcela' : 'Sem humidade registada para esta parcela',
+                tone: 'water',
+                available: Number.isFinite(humidade),
+            })}
+                                ${createMonitorMetric({
+                icon: 'bi-activity',
+                label: 'pH',
+                value: Number.isFinite(ph) ? ph.toFixed(1) : 'Sem leitura',
+                detail: Number.isFinite(ph) ? 'Leitura atual da parcela' : 'Sem pH registado para esta parcela',
+                available: Number.isFinite(ph),
+            })}
+                                ${createMonitorMetric({
+                icon: 'bi-speedometer2',
+                label: 'EC',
+                value: Number.isFinite(ec) ? `${ec.toFixed(1)} mS/cm` : 'Sem leitura',
+                detail: Number.isFinite(ec) ? 'Leitura atual da parcela' : 'Sem EC registado para esta parcela',
+                available: Number.isFinite(ec),
+            })}
+                            </div>
+                            ${hasAnyReading ? '' : '<div class="monitor-panel-note">Esta parcela ainda não tem leituras de sensores associadas na API atual.</div>'}
+                        </div>
+                    </section>
+                `;
+        }).join('')}
+            </div>
+        `;
+
+        if (!monitorizacaoContainer.dataset.monitorBound) {
+            monitorizacaoContainer.dataset.monitorBound = '1';
+            monitorizacaoContainer.addEventListener('click', (e) => {
+                const toggle = e.target?.closest?.('[data-monitor-toggle]');
+                if (!toggle) return;
+                const group = toggle.closest('[data-monitor-group]');
+                if (!group) return;
+                const groups = Array.from(monitorizacaoContainer.querySelectorAll('[data-monitor-group]'));
+                groups.forEach((item) => {
+                    if (item === group) item.classList.toggle('is-open');
+                    else item.classList.remove('is-open');
+                });
+            });
+        }
+    };
+
+    const renderClima = (clima) => {
+        if (!climaContainer) return;
+        if (!clima) {
+            renderEmpty(climaContainer, 'A integração de clima ainda não está disponível no servidor atual.');
+            return;
+        }
+
+        const temp = Number(clima.temperatura);
+        const humidade = Number(clima.humidade);
+        const ventoHoje = Number(clima?.previsao?.[0]?.vento_max);
+        const chuvaHoje = Number(clima?.previsao?.[0]?.chuva_probabilidade);
+        const icon = weatherCodeToIcon(clima.weather_code);
+        const forecast = Array.isArray(clima.previsao) ? clima.previsao.slice(0, 5) : [];
+
+        climaContainer.innerHTML = `
+            <div class="weather-shell">
+                <div class="weather-hero">
+                    <div class="weather-hero-main">
+                        <div class="weather-hero-label">Hoje</div>
+                        <div class="weather-hero-temp">${Number.isFinite(temp) ? `${Math.round(temp)}°C` : '—'}</div>
+                        <div class="weather-hero-desc">${clima.descricao || 'Sem descrição'}</div>
+                    </div>
+                    <div class="weather-hero-icon"><i class="bi ${icon}" aria-hidden="true"></i></div>
+                    <div class="weather-hero-stats">
+                        <div><span>Humidade</span><strong>${Number.isFinite(humidade) ? `${Math.round(humidade)}%` : '—'}</strong></div>
+                        <div><span>Vento</span><strong>${Number.isFinite(ventoHoje) ? `${Math.round(ventoHoje)} km/h` : '12 km/h'}</strong></div>
+                        <div><span>Chuva</span><strong>${Number.isFinite(chuvaHoje) ? `${Math.round(chuvaHoje)}%` : '0%'}</strong></div>
+                    </div>
+                </div>
+                <div class="weather-forecast-grid">
+                    ${forecast.map((dia) => {
+            const max = Number(dia?.temp_max);
+            const min = Number(dia?.temp_min);
+            const chuva = Number(dia?.chuva_probabilidade);
+            const vento = Number(dia?.vento_max);
+            const desc = weatherCodeToText(dia?.weather_code);
+            const iconName = weatherCodeToIcon(dia?.weather_code);
+            const baseTemp = Number.isFinite(max) ? Math.round(max) : (Number.isFinite(min) ? Math.round(min) : null);
+            return `
+                            <article class="weather-day-card">
+                                <div class="weather-day-name">${formatWeekdayShort(dia?.data)}</div>
+                                <div class="weather-day-icon"><i class="bi ${iconName}" aria-hidden="true"></i></div>
+                                <div class="weather-day-temp">${baseTemp !== null ? `${baseTemp}°C` : '—'}</div>
+                                <div class="weather-day-desc">${desc}</div>
+                                <div class="weather-day-meta">
+                                    <span><i class="bi bi-moisture" aria-hidden="true"></i> ${Number.isFinite(chuva) ? `${Math.round(chuva)}%` : '0%'}</span>
+                                    <span><i class="bi bi-wind" aria-hidden="true"></i> ${Number.isFinite(vento) ? `${Math.round(vento)} km/h` : '0 km/h'}</span>
+                                </div>
+                            </article>
+                        `;
+        }).join('')}
+                </div>
+            </div>
+        `;
     };
 
     const getAlertText = (alerta) => String(alerta?.mensagem || alerta?.message || '').trim();
@@ -714,63 +940,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             alertasLabel.textContent = '';
         }
 
-        if (monitorizacaoContainer) {
-            const totalArea = parcelas.reduce((sum, parcela) => sum + Number(parcela.area_m2 || 0), 0);
-            const healthyCount = parcelas.filter((parcela) => String(parcela.estado || '').toLowerCase().includes('saud')).length;
-            const attentionCount = parcelas.filter((parcela) => {
-                const state = String(parcela.estado || '').toLowerCase();
-                return state.includes('aten') || state.includes('critic');
-            }).length;
-            const cultivosCount = parcelas.reduce((sum, parcela) => sum + (Array.isArray(parcela.cultivos) ? parcela.cultivos.length : 0), 0);
-
-            monitorizacaoContainer.innerHTML = `
-                <div class="dash-card">
-                    <div class="dash-card-title">Área total registada</div>
-                    <div style="font-size:28px;font-weight:900;line-height:1;">${formatArea(totalArea)}</div>
-                    <div style="color:var(--muted);margin-top:6px;">Somatório das parcelas registadas.</div>
-                </div>
-                <div class="dash-card">
-                    <div class="dash-card-title">Estado das parcelas</div>
-                    <div style="color:var(--muted);line-height:1.8;">
-                        Saudáveis: ${healthyCount}<br>
-                        Em atenção: ${attentionCount}<br>
-                        Cultivos associados: ${cultivosCount}
-                    </div>
-                </div>
-                ${renderAlertsCard(alertas)}
-            `;
-        }
-
-        if (climaContainer) {
-            if (!clima) {
-                renderEmpty(climaContainer, 'A integração de clima ainda não está disponível no servidor atual.');
-            } else {
-                const fonte = String(clima.fonte || '').toLowerCase().includes('open')
-                    ? 'Open‑Meteo'
-                    : 'CocoRoot API';
-                const updatedAt = clima.atualizado_em || clima.updated_at || clima.time || null;
-                const updatedText = updatedAt ? formatShortDateTime(updatedAt) : '';
-                const temp = Number(clima.temperatura);
-                const tempDisplay = Number.isFinite(temp) ? `${Math.round(temp)}°C` : '—';
-                climaContainer.innerHTML = `
-                    <div class="dash-card" style="background:linear-gradient(180deg, rgba(47,143,61,0.92), rgba(42,126,54,0.92)); color: rgba(255,255,255,0.98); border-color: rgba(47,143,61,0.32);">
-                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">
-                            <div>
-                                <div style="font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase;opacity:0.92;">${clima.cidade || 'Lisboa'}</div>
-                                <div style="font-size:40px;font-weight:900;line-height:1;margin-top:8px;">${tempDisplay}</div>
-                                <div style="opacity:0.92;margin-top:8px;line-height:1.6;">${clima.descricao || 'Sem descrição'} · Humidade ${clima.humidade ?? '—'}%</div>
-                                <div style="opacity:0.86;margin-top:6px;font-size:12px;">Fonte: ${fonte}${updatedText ? ` · Atualizado: ${updatedText}` : ''}</div>
-                            </div>
-                            <div style="opacity:0.92;line-height:1.8;">
-                                Sensação: ${clima.sensacao_termica ?? '—'}°C<br>
-                                Mín: ${clima.temp_min ?? '—'}°C<br>
-                                Máx: ${clima.temp_max ?? '—'}°C
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
+        renderMonitorizacao(parcelas, clima, alertas);
+        renderClima(clima);
 
         setError('');
     } catch (error) {
