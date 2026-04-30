@@ -8,69 +8,69 @@
     <link rel="stylesheet" href="../css/cocoroot.css">
 </head>
 
-<body class="app-page">
-
-
+<body class="app-page dashboard-page">
     <div class="page-content">
-        <div class="dash-header">
-            <div>
-                <div class="dash-hello">Olá, <span id="dashboard-user-name">utilizador</span>!</div>
-                <div id="dashboard-greeting-text" class="dash-sub">A carregar dados do servidor...</div>
+        <div class="dashboard-shell">
+            <div class="dash-header">
+                <div>
+                    <div class="dash-hello">Olá, <span id="dashboard-user-name">utilizador</span>!</div>
+                    <div id="dashboard-greeting-text" class="dash-sub">A carregar dados do servidor...</div>
+                </div>
+                <div class="dash-actions">
+                    <a href="comecar.html" class="btn sm dash-action-btn">Começar do Zero</a>
+                    <a href="noticias.html" class="btn sm dash-action-btn dash-action-btn-secondary">Ver Notícias</a>
+                </div>
             </div>
-            <div class="dash-actions">
-                <a href="comecar.html" class="btn sm">Começar do Zero</a>
-                <a href="noticias.html" class="btn sm">Ver Notícias</a>
+
+            <div class="dash-divider" aria-hidden="true"></div>
+
+            <div id="dashboard-error" class="dash-card dash-error" hidden></div>
+
+            <div class="dash-stats-grid">
+                <div class="dash-stat-card">
+                    <div class="dash-stat-label">Parcelas Ativas</div>
+                    <div id="dashboard-parcelas-count" class="dash-value">0</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-label">Tarefas Pendentes</div>
+                    <div id="dashboard-tarefas-count" class="dash-value">0</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-label">Alertas</div>
+                    <div id="dashboard-alertas-count" class="dash-value">0</div>
+                </div>
             </div>
+
+            <div class="tabs dash-tabs" role="tablist" aria-label="Dashboard">
+                <button class="tab dash-tab active" type="button" data-tab="parcelas">Parcelas</button>
+                <button class="tab dash-tab" type="button" data-tab="tarefas">Tarefas</button>
+                <button class="tab dash-tab" type="button" data-tab="monitorizacao">Monitorização</button>
+                <button class="tab dash-tab" type="button" data-tab="clima">Clima</button>
+            </div>
+
+            <section data-panel="parcelas" class="dash-panel">
+                <div id="dashboard-parcelas-list" class="dash-cultivos-grid">
+                    <a href="registrar-cultivo.html" class="dash-add-card">
+                        <span class="dash-add-icon" aria-hidden="true">+</span>
+                        <span>Adicionar cultivo</span>
+                    </a>
+                </div>
+            </section>
+
+            <section data-panel="tarefas" class="dash-panel" hidden>
+                <div class="dash-list-shell">
+                    <div id="dashboard-tarefas-list" class="stack"></div>
+                </div>
+            </section>
+
+            <section data-panel="monitorizacao" class="dash-panel" hidden>
+                <div id="dashboard-monitorizacao" class="panel-grid"></div>
+            </section>
+
+            <section data-panel="clima" class="dash-panel" hidden>
+                <div id="dashboard-clima" class="panel-grid"></div>
+            </section>
         </div>
-
-        <div id="dashboard-error" class="dash-card" style="margin-bottom:16px;color:#8a1f11;" hidden></div>
-
-        <div class="dash-stats-grid">
-            <div class="dash-card">
-                <div class="dash-card-title">Parcelas</div>
-                <div id="dashboard-parcelas-count" class="dash-value">0</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-title">Tarefas</div>
-                <div id="dashboard-tarefas-count" class="dash-value">0</div>
-            </div>
-            <div class="dash-card">
-                <div class="dash-card-title">Alertas</div>
-                <div id="dashboard-alertas-count" class="dash-value">0</div>
-            </div>
-        </div>
-
-        <div class="tabs" role="tablist" aria-label="Dashboard">
-            <button class="tab active" type="button" data-tab="parcelas">Parcelas</button>
-            <button class="tab" type="button" data-tab="tarefas">Tarefas</button>
-            <button class="tab" type="button" data-tab="monitorizacao">Monitoramento</button>
-            <button class="tab" type="button" data-tab="clima">Clima</button>
-        </div>
-
-        <section data-panel="parcelas">
-            <div id="dashboard-parcelas-list"
-                class="grid-auto" style="margin-bottom:16px;">
-            </div>
-            <div>
-                <a href="registrar-cultivo.html" class="btn">Registrar Cultivo</a>
-            </div>
-        </section>
-
-        <section data-panel="tarefas" hidden>
-            <div class="dash-card" style="margin-bottom:14px;">
-                <div class="dash-card-title">Hoje</div>
-                <div id="dashboard-tarefas-list" class="stack"></div>
-            </div>
-        </section>
-
-        <section data-panel="monitorizacao" hidden>
-            <div id="dashboard-monitorizacao" class="panel-grid"></div>
-        </section>
-
-        <section data-panel="clima" hidden>
-            <div id="dashboard-clima" class="panel-grid"></div>
-        </section>
-
     </div>
 
     <script src="../js/api.js"></script>

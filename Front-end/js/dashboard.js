@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errorBox = document.getElementById('dashboard-error');
 
     if (greetingName) greetingName.textContent = user.nome || 'utilizador';
-    if (greetingText) greetingText.textContent = 'Visão geral carregada a partir dos dados disponíveis no servidor.';
+    if (greetingText) greetingText.textContent = 'Bem-vindo ao dashboard da sua exploração agrícola, onde encontra tudo num só sítio!';
 
     const setError = (message) => {
         if (!errorBox) return;
@@ -29,6 +29,70 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderEmpty = (container, message) => {
         if (!container) return;
         container.innerHTML = `<div class="card"><div style="color:var(--muted);line-height:1.6;">${message}</div></div>`;
+    };
+
+    const renderParcelas = (parcelas) => {
+        if (!parcelasContainer) return;
+        const list = Array.isArray(parcelas) ? parcelas : [];
+        if (list.length === 0) {
+            parcelasContainer.innerHTML = `
+                <div class="dash-empty-card">
+                    <div style="color:var(--muted);line-height:1.6;">Ainda não existem parcelas registadas.</div>
+                </div>
+                <a href="registrar-cultivo.html" class="dash-add-card">
+                    <span class="dash-add-icon" aria-hidden="true">+</span>
+                    <span>Adicionar cultivo</span>
+                </a>
+            `;
+            return;
+        }
+
+        const cards = list.map((parcela) => {
+            const cultivos = Array.isArray(parcela.cultivos) ? parcela.cultivos : [];
+            const cultivo = cultivos[0];
+            const ph = Number(cultivo?.ph ?? parcela?.ph);
+            const ec = Number(cultivo?.ec ?? parcela?.ec);
+            const humidade = Number(cultivo?.humidade ?? parcela?.humidade);
+            const area = Number(parcela?.area_m2 || 0);
+            const estado = String(parcela?.estado || parcela?.par_estado || 'Ativo');
+            const phText = Number.isFinite(ph) ? ph.toFixed(1) : '6.5';
+            const ecText = Number.isFinite(ec) ? `${ec.toFixed(1)}mS/cm` : '1.8mS/cm';
+            const humidadeText = Number.isFinite(humidade) ? `${Math.round(humidade)}%` : '55%';
+            const areaText = area > 0 ? `${area.toFixed(0)}m²` : 'Sem área';
+
+            return `
+                <article class="dash-cultivo-card">
+                    <div class="dash-cultivo-top">
+                        <div class="dash-cultivo-icon"><i class="bi bi-flower1" aria-hidden="true"></i></div>
+                        <span class="dash-cultivo-badge">${estado}</span>
+                    </div>
+                    <div class="dash-cultivo-name">${cultivo?.nome || parcela.nome || 'Cultivo'}</div>
+                    <div class="dash-cultivo-meta">${parcela.nome || 'Parcela'} · ${areaText}</div>
+                    <div class="dash-cultivo-metrics">
+                        <div class="dash-cultivo-metric">
+                            <span>pH</span>
+                            <strong>${phText}</strong>
+                        </div>
+                        <div class="dash-cultivo-metric">
+                            <span>EC</span>
+                            <strong>${ecText}</strong>
+                        </div>
+                        <div class="dash-cultivo-metric">
+                            <span>Humidade</span>
+                            <strong>${humidadeText}</strong>
+                        </div>
+                    </div>
+                    <button type="button" class="dash-cultivo-link">Ver Detalhes</button>
+                </article>
+            `;
+        }).join('');
+
+        parcelasContainer.innerHTML = `${cards}
+            <a href="registrar-cultivo.html" class="dash-add-card">
+                <span class="dash-add-icon" aria-hidden="true">+</span>
+                <span>Adicionar cultivo</span>
+            </a>
+        `;
     };
 
     const fetchOptional = async (path) => {
@@ -341,15 +405,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         tarefasContainer.innerHTML = visible.map((tarefa) => {
             const dueText = formatShortDateTime(tarefa.data_inicio);
+            const tipo = String(tarefa?.tipo || tarefa?.categoria || 'Tarefa').trim();
+            const label = tipo ? `${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}` : 'Tarefa';
             return `
-                <button type="button" data-task-id="${String(tarefa.id || '')}" style="all:unset;cursor:pointer;display:block;">
-                    <div style="display:flex;align-items:flex-start;gap:10px;">
-                        <div class="check-box">•</div>
-                        <div>
-                            <div style="font-weight:900;">${tarefa.titulo || 'Tarefa'}</div>
-                            <div style="color:var(--muted);line-height:1.6;">${tarefa.parcela_nome || 'Sem parcela'} · Pendente · ${dueText}</div>
+                <button type="button" class="dash-task-row" data-task-id="${String(tarefa.id || '')}">
+                    <div class="dash-task-main">
+                        <div class="dash-task-title-row">
+                            <div class="dash-task-title">${tarefa.titulo || 'Tarefa'}</div>
+                            <span class="dash-task-tag">${label}</span>
                         </div>
+                        <div class="dash-task-sub">${tarefa.parcela_nome || 'Sem parcela'} · ${dueText}</div>
                     </div>
+                    <span class="dash-task-check" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
                 </button>
             `;
         }).join('');
@@ -578,20 +645,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (alertasLabel) alertasLabel.textContent = '';
 
         if (parcelas.length === 0) {
-            renderEmpty(parcelasContainer, 'Ainda não existem parcelas registadas.');
+            renderParcelas(parcelas);
         } else if (parcelasContainer) {
-            parcelasContainer.innerHTML = parcelas.map((parcela) => {
-                const cultivos = Array.isArray(parcela.cultivos) ? parcela.cultivos : [];
-                const cultivo = cultivos[0];
-                return `
-                    <div class="card">
-                        <div style="font-weight:900;margin-bottom:6px;">${parcela.nome || 'Parcela'}</div>
-                        <div style="color:var(--muted);line-height:1.6;">Estado: ${parcela.estado || 'Sem estado'}</div>
-                        <div style="color:var(--muted);line-height:1.6;">Área: ${formatArea(parcela.area_m2)}</div>
-                        <div style="color:var(--muted);line-height:1.6;">Cultivo: ${cultivo?.nome || 'Não definido'}</div>
-                    </div>
-                `;
-            }).join('');
+            renderParcelas(parcelas);
         }
 
         const hasServerTasks = serverTarefas.length > 0;
@@ -634,12 +690,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hasServerTasks) {
             if (tarefasContainer) {
                 tarefasContainer.innerHTML = tarefas.map((tarefa) => `
-                    <div style="display:flex;align-items:flex-start;gap:10px;">
-                        <div class="check-box">${String(tarefa.estado || '').toLowerCase().includes('conclu') ? '✓' : '•'}</div>
-                        <div>
-                            <div style="font-weight:900;">${tarefa.titulo || 'Tarefa'}</div>
-                            <div style="color:var(--muted);line-height:1.6;">${tarefa.parcela_nome || 'Sem parcela'} · ${tarefa.estado || 'Sem estado'} · ${formatDate(tarefa.data_inicio)}</div>
+                    <div class="dash-task-row dash-task-row-static">
+                        <div class="dash-task-main">
+                            <div class="dash-task-title-row">
+                                <div class="dash-task-title">${tarefa.titulo || 'Tarefa'}</div>
+                                <span class="dash-task-tag">${String(tarefa.tipo || tarefa.categoria || 'Tarefa')}</span>
+                            </div>
+                            <div class="dash-task-sub">${tarefa.parcela_nome || 'Sem parcela'} · ${formatDate(tarefa.data_inicio)}</div>
                         </div>
+                        <span class="dash-task-check ${String(tarefa.estado || '').toLowerCase().includes('conclu') ? 'is-done' : ''}" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
                     </div>
                 `).join('');
             }
