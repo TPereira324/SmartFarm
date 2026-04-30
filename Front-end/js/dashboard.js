@@ -50,6 +50,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cards = list.map((parcela) => {
             const cultivos = Array.isArray(parcela.cultivos) ? parcela.cultivos : [];
             const cultivo = cultivos[0];
+            const normalizeText = (value) => String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const cultivoNome = String(
+                cultivo?.nome ?? parcela?.tipo ?? parcela?.cultivo ?? parcela?.cultivo_nome ?? parcela?.nome ?? '',
+            ).trim();
+            const cultivoNorm = normalizeText(cultivoNome);
+            const has = (...words) => words.some((w) => cultivoNorm.includes(normalizeText(w)));
+            const iconClass = has('alface', 'couve', 'espinafre', 'rúcula', 'rucula', 'repolho')
+                ? 'dash-cultivo-icon--folhosas'
+                : has('tomate', 'pimento', 'pepino', 'abobrinha', 'courgette', 'beringela', 'melancia', 'melao', 'melão', 'morango')
+                    ? 'dash-cultivo-icon--frutiferas'
+                    : has('manjericão', 'manjericao', 'hortelã', 'hortela', 'salsa', 'coentros', 'alecrim', 'orégãos', 'oregãos', 'oregano', 'cebolinho')
+                        ? 'dash-cultivo-icon--ervas'
+                        : has('batata', 'cenoura', 'beterraba', 'nabo', 'rabanete')
+                            ? 'dash-cultivo-icon--raizes'
+                            : 'dash-cultivo-icon--geral';
+
+            const cultivoIcon = (() => {
+                if (!cultivoNome) return 'C';
+                if (has('morango')) return '🍓';
+                if (has('tomate')) return '🍅';
+                if (has('pimento')) return '🫑';
+                if (has('pepino')) return '🥒';
+                if (has('alface', 'couve', 'espinafre', 'rúcula', 'rucula', 'repolho')) return '🥬';
+                if (has('manjericão', 'manjericao', 'hortelã', 'hortela', 'salsa', 'coentros', 'alecrim', 'orégãos', 'oregãos', 'oregano', 'cebolinho')) return '🌿';
+                if (has('batata')) return '🥔';
+                if (has('cenoura', 'beterraba', 'nabo', 'rabanete')) return '🥕';
+                if (iconClass === 'dash-cultivo-icon--frutiferas') return '🍅';
+                if (iconClass === 'dash-cultivo-icon--folhosas') return '🥬';
+                if (iconClass === 'dash-cultivo-icon--ervas') return '🌿';
+                if (iconClass === 'dash-cultivo-icon--raizes') return '🥕';
+                return cultivoNome.slice(0, 1).toUpperCase();
+            })();
             const ph = Number(cultivo?.ph ?? parcela?.ph);
             const ec = Number(cultivo?.ec ?? parcela?.ec);
             const humidade = Number(cultivo?.humidade ?? parcela?.humidade);
@@ -63,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `
                 <article class="dash-cultivo-card">
                     <div class="dash-cultivo-top">
-                        <div class="dash-cultivo-icon"><i class="bi bi-flower1" aria-hidden="true"></i></div>
+                        <div class="dash-cultivo-icon ${iconClass}" aria-hidden="true">${cultivoIcon}</div>
                         <span class="dash-cultivo-badge">${estado}</span>
                     </div>
                     <div class="dash-cultivo-name">${cultivo?.nome || parcela.nome || 'Cultivo'}</div>

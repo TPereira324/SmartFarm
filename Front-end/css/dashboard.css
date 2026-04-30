@@ -210,9 +210,39 @@
     border-radius: 9px;
     display: grid;
     place-items: center;
-    background: #3f9a42;
+    background: linear-gradient(145deg, #ffffff, #dcdcdc);
+    color: rgba(27, 27, 27, 0.92);
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 -7px 14px rgba(0, 0, 0, 0.12);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.dash-cultivo-icon--frutiferas {
+    background: radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 48%), linear-gradient(145deg, #ff5c76, #c5152d);
     color: #fff;
-    font-size: 18px;
+}
+
+.dash-cultivo-icon--folhosas {
+    background: radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 48%), linear-gradient(145deg, #44d96d, #1c7a36);
+    color: #fff;
+}
+
+.dash-cultivo-icon--ervas {
+    background: radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 48%), linear-gradient(145deg, #1fbf9a, #0c6b55);
+    color: #fff;
+}
+
+.dash-cultivo-icon--raizes {
+    background: radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 48%), linear-gradient(145deg, #ffb44a, #c96a00);
+    color: #fff;
+}
+
+.dash-cultivo-icon--geral {
+    background: radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 55%), linear-gradient(145deg, #ffffff, #dcdcdc);
+    color: rgba(27, 27, 27, 0.92);
 }
 
 .dash-cultivo-badge {
