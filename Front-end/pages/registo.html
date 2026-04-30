@@ -127,6 +127,7 @@
             </form>
         </div>
 
+        <script src="../js/config.js"></script>
         <script src="../js/api.js"></script>
         <script src="../js/models/utilizadorModel.js"></script>
         <script src="../js/views/utilizadorView.js"></script>
@@ -142,7 +143,7 @@
                 const toggleRegConfirmPasswordBtn = document.getElementById('toggle-register-confirm-password');
 
                 if (registerForm && window.CocoRootApi) {
-                    registerForm.action = window.CocoRootApi.buildPhpUrl('registrar.php');
+                    registerForm.action = window.CocoRootApi.buildBackendUrl('usuarios/registar');
                 }
 
                 if (backBtn) {

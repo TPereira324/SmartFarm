@@ -1,0 +1,13 @@
+<?php
+
+return [
+    'db' => [
+        'host' => '127.0.0.1',
+        'name' => 'coco_db',
+        'user' => 'root',
+        'password' => 'root',
+        'password_candidates' => ['root', ''],
+        'ports' => [3306, 8889],
+        'charset' => 'utf8mb4',
+    ],
+];

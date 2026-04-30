@@ -24,7 +24,7 @@ class PrevisaoTempoService {
      */
     public function consultarClima(string $cidade): PrevisaoTempoDto {
         if (empty($cidade)) {
-            throw new Exception("O nome da cidade é obrigatório.");
+            throw new Exception("O nome da cidade ├® obrigat├│rio.");
         }
 
        
@@ -35,7 +35,7 @@ class PrevisaoTempoService {
 
         if ($resposta === false) {
             $error = error_get_last();
-            throw new Exception("Erro ao conectar com o serviço de meteorologia. Verifique a cidade ou tente mais tarde.");
+            throw new Exception("Erro ao conectar com o servi├ºo de meteorologia. Verifique a cidade ou tente mais tarde.");
         }
 
         

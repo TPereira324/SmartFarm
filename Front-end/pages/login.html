@@ -44,6 +44,7 @@
             </form>
         </div>
     </div>
+    <script src="../js/config.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/layout.js"></script>
     <script>
@@ -66,22 +67,26 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const endpoint = window.CocoRootApi
-                ? window.CocoRootApi.buildPhpUrl('login.php')
-                : new URL('/CocoRoot/Back-end/login.php', window.location.origin).toString();
+                ? window.CocoRootApi.buildBackendUrl('usuarios/login')
+                : new URL('usuarios/login', window.CocoRootConfig?.apiBaseUrl || new URL('api.php/', new URL('../Back-end/', window.location.href))).toString();
 
             if (form) {
                 form.action = endpoint;
             }
 
             try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+                const data = window.CocoRootApi && typeof window.CocoRootApi.fetchJson === 'function'
+                    ? await window.CocoRootApi.fetchJson('usuarios/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    })
+                    : await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    }).then((response) => response.json());
 
-                // ... (rest of the logic)
-                const data = await response.json();
                 if (data.success) {
                     localStorage.setItem('user', JSON.stringify(data.user));
                     window.location.href = 'dashboard.html';
@@ -89,7 +94,7 @@
                     alert(data.message || 'Erro ao entrar.');
                 }
             } catch (err) {
-                alert('Erro de ligação ao servidor.');
+                alert(err?.message || 'Erro de ligação ao servidor.');
             }
         });
     </script>

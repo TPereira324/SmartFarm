@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Dto\ForumDto;
 use App\Service\ForumService;
 use Exception;
 
@@ -13,36 +12,59 @@ class ForumController extends Controller {
         $this->forumService = new ForumService();
     }
 
-    /**
-     * Publicar novo tópico via POST
-     */
     public function publicar(): void {
         try {
-            $forumDto = ForumDto::fromArray($_POST);
-            $resultado = $this->forumService->publicarTopico($forumDto);
+            $dados = $this->input();
+            $resultado = $this->forumService->publicarTopico(
+                (int)($dados['ut_id'] ?? $dados['usuario_id'] ?? 0),
+                (string)($dados['titulo'] ?? ''),
+                (string)($dados['conteudo'] ?? ''),
+                (string)($dados['categoria'] ?? 'outros')
+            );
+            $this->success($resultado, 'Tópico publicado com sucesso!', 201);
+        } catch (Exception $e) {
+            $status = str_contains($e->getMessage(), 'Utilizador inválido') ? 401 : 400;
+            $this->erro($e->getMessage(), $status);
+        }
+    }
 
-            $this->json([
-                'status' => 'sucesso',
-                'mensagem' => 'Tópico publicado!',
-                'dados' => $resultado
-            ], 201);
+    public function listar(): void {
+        try {
+            $this->success($this->forumService->listarTopicos());
         } catch (Exception $e) {
             $this->erro($e->getMessage());
         }
     }
 
-    /**
-     * Listar todos os tópicos via GET
-     */
-    public function listar(): void {
+    public function detalhe(int $id): void {
         try {
-            $topicos = $this->forumService->listarTopicos();
-            $this->json([
-                'status' => 'sucesso',
-                'dados' => $topicos
-            ]);
+            $this->success($this->forumService->obterDetalhe($id));
         } catch (Exception $e) {
-            $this->erro($e->getMessage());
+            $status = str_contains($e->getMessage(), 'não encontrada') ? 404 : 400;
+            $this->erro($e->getMessage(), $status);
+        }
+    }
+
+    public function comentarios(int $id): void {
+        try {
+            $this->success($this->forumService->listarComentarios($id));
+        } catch (Exception $e) {
+            $this->erro($e->getMessage(), 400);
+        }
+    }
+
+    public function comentar(int $id): void {
+        try {
+            $dados = $this->input();
+            $resultado = $this->forumService->comentar(
+                $id,
+                (int)($dados['ut_id'] ?? $dados['usuario_id'] ?? 0),
+                (string)($dados['conteudo'] ?? '')
+            );
+            $this->success($resultado, 'Comentário enviado com sucesso!', 201);
+        } catch (Exception $e) {
+            $status = str_contains($e->getMessage(), 'Utilizador inválido') ? 401 : 400;
+            $this->erro($e->getMessage(), $status);
         }
     }
 }

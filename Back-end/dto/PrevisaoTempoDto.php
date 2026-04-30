@@ -32,7 +32,7 @@ readonly class PrevisaoTempoDto {
             cidade: $dados['name'] ?? 'Desconhecida',
             temperatura: (float)($dados['main']['temp'] ?? 0),
             humidade: (int)($dados['main']['humidity'] ?? 0),
-            descricao: $dados['weather'][0]['description'] ?? 'Sem descrição',
+            descricao: $dados['weather'][0]['description'] ?? 'Sem descri├º├úo',
             sensacao_termica: (float)($dados['main']['feels_like'] ?? 0),
             temp_min: (float)($dados['main']['temp_min'] ?? 0),
             temp_max: (float)($dados['main']['temp_max'] ?? 0),

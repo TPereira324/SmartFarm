@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use App\Dto\ForumDto;
-use App\Model\Forum;
 use App\Repository\ForumRepository;
 use Exception;
 
@@ -14,41 +12,53 @@ class ForumService {
         $this->forumRepository = new ForumRepository();
     }
 
-    
-     
-    public function publicarTopico(ForumDto $forumDto): ForumDto {
-        $forum = new Forum(
-            usuario_id: $forumDto->usuario_id,
-            titulo: $forumDto->titulo,
-            conteudo: $forumDto->conteudo,
-            categoria: $forumDto->categoria
-        );
-
-        if (!$this->forumRepository->salvar($forum)) {
-            throw new Exception("Erro ao publicar tópico.");
+    public function publicarTopico(int $usuarioId, string $titulo, string $conteudo, string $categoria): array {
+        if ($usuarioId <= 0) {
+            throw new Exception("Utilizador inválido.");
+        }
+        if (trim($titulo) === '') {
+            throw new Exception("Título obrigatório.");
+        }
+        if (trim($conteudo) === '') {
+            throw new Exception("Conteúdo obrigatório.");
         }
 
-        return ForumDto::fromArray([
-            'id' => $forum->id,
-            'usuario_id' => $forum->usuario_id,
-            'titulo' => $forum->titulo,
-            'conteudo' => $forum->conteudo,
-            'categoria' => $forum->categoria,
-            'data_criacao' => $forum->data_criacao
-        ]);
+        return ['id' => $this->forumRepository->publicar($usuarioId, trim($titulo), trim($conteudo), trim($categoria) ?: 'outros')];
     }
 
-    
     public function listarTopicos(): array {
-        $topicos = $this->forumRepository->listarTodos();
-        
-        return array_map(fn($f) => ForumDto::fromArray([
-            'id' => $f->id,
-            'usuario_id' => $f->usuario_id,
-            'titulo' => $f->titulo,
-            'conteudo' => $f->conteudo,
-            'categoria' => $f->categoria,
-            'data_criacao' => $f->data_criacao
-        ]), $topicos);
+        return $this->forumRepository->listarTodos();
+    }
+
+    public function obterDetalhe(int $postId): array {
+        if ($postId <= 0) {
+            throw new Exception("Publicação inválida.");
+        }
+        $post = $this->forumRepository->buscarPorId($postId);
+        if (!$post) {
+            throw new Exception("Publicação não encontrada.");
+        }
+        return $post;
+    }
+
+    public function listarComentarios(int $postId): array {
+        if ($postId <= 0) {
+            throw new Exception("Publicação inválida.");
+        }
+        return $this->forumRepository->listarComentarios($postId);
+    }
+
+    public function comentar(int $postId, int $usuarioId, string $conteudo): array {
+        if ($postId <= 0) {
+            throw new Exception("Publicação inválida.");
+        }
+        if ($usuarioId <= 0) {
+            throw new Exception("Utilizador inválido.");
+        }
+        if (trim($conteudo) === '') {
+            throw new Exception("Comentário vazio.");
+        }
+
+        return ['id' => $this->forumRepository->comentar($postId, $usuarioId, trim($conteudo))];
     }
 }

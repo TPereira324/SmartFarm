@@ -2,8 +2,6 @@
 
 namespace App\Service;
 
-use App\Dto\UsuarioDto;
-use App\Model\Usuario;
 use App\Repository\UsuarioRepository;
 use Exception;
 
@@ -14,79 +12,48 @@ class UsuarioService {
         $this->usuarioRepository = new UsuarioRepository();
     }
 
-    /**
-     * Regista um novo utilizador no sistema
-     */
-    public function registar(string $nome, string $email, string $senha): UsuarioDto {
-        // Verificar se o email já existe
+    public function registar(string $nome, string $email, string $senha, string $nomeFazenda = ''): array {
         if ($this->usuarioRepository->buscarPorEmail($email)) {
             throw new Exception("Este email já está registado.");
         }
 
-        // Criar o modelo com a senha em hash
-        $usuario = new Usuario(
-            nome: $nome,
-            email: $email,
-            senha: password_hash($senha, PASSWORD_DEFAULT),
-            nivel_experiencia: 'iniciante'
+        if (trim($nome) === '' || trim($email) === '' || trim($senha) === '') {
+            throw new Exception("Preenche todos os campos obrigatórios.");
+        }
+
+        return $this->usuarioRepository->criar(
+            trim($nome),
+            trim($email),
+            password_hash($senha, PASSWORD_DEFAULT),
+            trim($nomeFazenda)
         );
-
-        if (!$this->usuarioRepository->salvar($usuario)) {
-            throw new Exception("Erro ao criar conta.");
-        }
-
-        return UsuarioDto::fromArray([
-            'id' => $usuario->id,
-            'nome' => $usuario->nome,
-            'email' => $usuario->email,
-            'nivel_experiencia' => $usuario->nivel_experiencia
-        ]);
     }
 
-    /**
-     * Realiza o login do utilizador
-     */
-    public function login(string $email, string $senha): UsuarioDto {
-        $usuario = $this->usuarioRepository->buscarPorEmail($email);
+    public function login(string $email, string $senha): array {
+        $usuario = $this->usuarioRepository->buscarPorEmail(trim($email), true);
 
-        if (!$usuario || !password_verify($senha, $usuario->senha)) {
-            throw new Exception("Credenciais inválidas.");
+        if (!$usuario || !password_verify($senha, (string)($usuario['senha'] ?? ''))) {
+            if (!$usuario) {
+                throw new Exception("Utilizador não encontrado.");
+            }
+            throw new Exception("Palavra-passe incorreta.");
         }
 
-        return UsuarioDto::fromArray([
-            'id' => $usuario->id,
-            'nome' => $usuario->nome,
-            'email' => $usuario->email,
-            'foto_perfil' => $usuario->foto_perfil,
-            'nivel_experiencia' => $usuario->nivel_experiencia,
-            'data_registo' => $usuario->data_registo
-        ]);
+        unset($usuario['senha']);
+        return $usuario;
     }
 
-    /**
-     * Pesquisa utilizadores por nome ou email
-     */
     public function pesquisar(string $termo): array {
         return $this->usuarioRepository->pesquisarPorTermo($termo);
     }
 
-    /**
-     * Obtém os dados de perfil do utilizador
-     */
-    public function obterPerfil(int $id): UsuarioDto {
+    public function obterPerfil(int $id): array {
         $usuario = $this->usuarioRepository->buscarPorId($id);
         
         if (!$usuario) {
             throw new Exception("Utilizador não encontrado.");
         }
 
-        return UsuarioDto::fromArray([
-            'id' => $usuario->id,
-            'nome' => $usuario->nome,
-            'email' => $usuario->email,
-            'foto_perfil' => $usuario->foto_perfil,
-            'nivel_experiencia' => $usuario->nivel_experiencia,
-            'data_registo' => $usuario->data_registo
-        ]);
+        return $usuario;
     }
 }
