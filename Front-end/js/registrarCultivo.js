@@ -13,7 +13,9 @@
     const btnNext = document.querySelector('[data-step-next]');
     const btnSave = document.querySelector('[data-step-save]');
 
-    const summaryParcel = document.querySelector('[data-summary-parcela]');
+    const summaryLargura = document.querySelector('[data-summary-largura]');
+    const summaryComprimento = document.querySelector('[data-summary-comprimento]');
+    const summaryProfundidade = document.querySelector('[data-summary-profundidade]');
     const summaryTipo = document.querySelector('[data-summary-tipo]');
     const summaryObjetivo = document.querySelector('[data-summary-objetivo]');
     const summaryMetodo = document.querySelector('[data-summary-metodo]');
@@ -105,7 +107,9 @@
         const largura = String(state.largura).trim();
         const comprimento = String(state.comprimento).trim();
         const profundidade = String(state.profundidade).trim();
-        if (summaryParcel) summaryParcel.textContent = `${largura} m × ${comprimento} m × ${profundidade} m`;
+        if (summaryLargura) summaryLargura.textContent = largura || '—';
+        if (summaryComprimento) summaryComprimento.textContent = comprimento || '—';
+        if (summaryProfundidade) summaryProfundidade.textContent = profundidade || '—';
         if (summaryTipo) summaryTipo.textContent = state.tipo || '—';
         if (summaryObjetivo) summaryObjetivo.textContent = state.objetivo || '—';
         if (summaryMetodo) summaryMetodo.textContent = state.metodo || '—';

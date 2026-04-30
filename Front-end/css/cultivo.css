@@ -235,27 +235,53 @@
     margin: 0 auto;
 }
 
+.cultivo-confirm-card {
+    max-width: 100%;
+}
+
+.cultivo-confirm-heading {
+    margin: 8px 0 12px;
+    font-size: 18px;
+    font-weight: 900;
+    color: rgba(27, 27, 27, 0.96);
+}
+
+.cultivo-summary-box {
+    max-width: 360px;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(63, 142, 68, 0.42);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.52);
+    gap: 0;
+}
+
 .cultivo-summary-row {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 14px;
     padding: 12px 0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid rgba(63, 142, 68, 0.68);
 }
 
 .cultivo-summary-key {
-    font-size: 11px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    color: rgba(27, 27, 27, 0.68);
 }
 
 .cultivo-summary-val {
     font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: rgba(27, 27, 27, 0.9);
+}
+
+.cultivo-summary-row:last-child {
+    border-bottom: 0;
 }
 
 @media (max-width: 760px) {
