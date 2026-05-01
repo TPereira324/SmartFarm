@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - CocoRoot</title>
+    <link rel="stylesheet" href="../css/cocoroot.css">
+</head>
+
+<body class="app-page">
+    <div class="page-content">
+        <section class="reports-shell">
+            <div class="reports-head">
+                <div class="reports-title">Relatórios Detalhados</div>
+                <div class="reports-subtitle">Analise produtividade e planeie o crescimento.</div>
+                <div class="reports-divider" aria-hidden="true"></div>
+            </div>
+
+            <div class="reports-toolbar">
+                <div class="reports-control">
+                    <label for="reports-period">Período</label>
+                    <select id="reports-period" class="reports-select">
+                        <option value="7d">Últimos 7 dias</option>
+                        <option value="30d" selected>Últimos 30 dias</option>
+                        <option value="90d">Últimos 90 dias</option>
+                    </select>
+                </div>
+                <div class="reports-control">
+                    <label for="reports-focus">Foco</label>
+                    <select id="reports-focus" class="reports-select">
+                        <option value="geral" selected>Visão geral</option>
+                        <option value="rega">Rega</option>
+                        <option value="tarefas">Tarefas</option>
+                    </select>
+                </div>
+                <button id="reports-refresh" class="btn sm outline" type="button">
+                    <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Atualizar
+                </button>
+                <button id="reports-export-csv" class="btn sm outline" type="button">
+                    <i class="bi bi-file-earmark-spreadsheet" aria-hidden="true"></i> Exportar CSV
+                </button>
+                <button id="reports-export-pdf" class="btn sm outline" type="button">
+                    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> Exportar PDF
+                </button>
+            </div>
+
+            <div class="reports-stats-grid">
+                <article class="reports-stat-card">
+                    <div class="reports-stat-label">Produtividade Mensal</div>
+                    <div id="stat-productividade" class="reports-stat-value reports-loading-line reports-loading-short"></div>
+                    <div class="reports-stat-meta">Comparado com o mês anterior</div>
+                </article>
+                <article class="reports-stat-card">
+                    <div class="reports-stat-label">Eficiência da Rega</div>
+                    <div id="stat-rega" class="reports-stat-value reports-loading-line reports-loading-short"></div>
+                    <div class="reports-stat-meta">Baseado nos últimos 30 dias</div>
+                </article>
+                <article class="reports-stat-card">
+                    <div class="reports-stat-label">Tarefas Concluídas</div>
+                    <div id="stat-tarefas" class="reports-stat-value reports-loading-line reports-loading-short"></div>
+                    <div class="reports-stat-meta">Atividades concluídas no ciclo atual</div>
+                </article>
+            </div>
+
+            <div class="reports-chart-grid">
+                <article class="reports-chart-card">
+                    <div class="reports-chart-head">
+                        <h2 class="reports-chart-title">Produtividade por Semana</h2>
+                        <span class="reports-loading-pill">A carregar...</span>
+                    </div>
+                    <div id="reports-line-chart" class="reports-line-chart" aria-hidden="true">
+                        <div id="reports-line-wave" class="reports-line-wave"></div>
+                        <div id="reports-line-points" class="reports-line-points"></div>
+                        <div id="reports-line-tooltip" class="reports-line-tooltip" hidden></div>
+                    </div>
+                </article>
+
+                <article class="reports-chart-card">
+                    <div class="reports-chart-head">
+                        <h2 class="reports-chart-title">Distribuição e Performance</h2>
+                        <span class="reports-loading-pill">A carregar...</span>
+                    </div>
+                    <div class="reports-resource-layout">
+                        <div id="reports-bars" class="reports-bars" aria-hidden="true">
+                            <div class="reports-bar reports-loading-line" style="height: 45%"></div>
+                            <div class="reports-bar reports-loading-line" style="height: 72%"></div>
+                            <div class="reports-bar reports-loading-line" style="height: 58%"></div>
+                            <div class="reports-bar reports-loading-line" style="height: 88%"></div>
+                            <div class="reports-bar reports-loading-line" style="height: 66%"></div>
+                            <div class="reports-bar reports-loading-line" style="height: 54%"></div>
+                        </div>
+                        <div class="reports-donut-shell">
+                            <div id="reports-donut" class="reports-donut reports-loading-line">
+                                <div id="reports-donut-value" class="reports-donut-value">--</div>
+                            </div>
+                            <div id="reports-donut-label" class="reports-donut-label">Performance global</div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <div class="reports-sections-grid">
+                <article class="reports-block">
+                    <h2 class="reports-block-title">Resumo Semanal</h2>
+                    <p id="reports-summary-copy" class="reports-block-copy">A processar dados de produtividade, irrigação e alertas para gerar um resumo semanal mais preciso.</p>
+                    <ul id="reports-summary-list" class="reports-list">
+                        <li class="reports-loading-line"></li>
+                        <li class="reports-loading-line"></li>
+                        <li class="reports-loading-line"></li>
+                    </ul>
+                </article>
+
+                <article class="reports-block">
+                    <h2 class="reports-block-title">Planeamento de Crescimento</h2>
+                    <p class="reports-block-copy">As recomendações serão disponibilizadas após concluir o carregamento completo das estatísticas.</p>
+                    <div class="reports-actions">
+                        <a href="dashboard.html" class="btn sm">Ver Dashboard</a>
+                        <a href="registrar-cultivo.html" class="btn sm outline">Adicionar Cultivo</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/relatorios.js"></script>
+    <script src="../js/layout.js"></script>
+</body>
+
+</html>

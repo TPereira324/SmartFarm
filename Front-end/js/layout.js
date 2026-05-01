@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="nav-links">
             <a href="noticias.html" class="nav-link ${currentPath.includes('noticias') || currentPath.includes('post') ? 'active' : ''}">Notícias</a>
             <a href="dashboard.html" class="nav-link ${currentPath.includes('dashboard') || currentPath.includes('registrar-cultivo') ? 'active' : ''}">Dashboard</a>
+            <a href="relatorios.html" class="nav-link ${currentPath.includes('relatorios') ? 'active' : ''}">Relatórios</a>
             <a href="comunidade.html" class="nav-link ${currentPath.includes('comunidade') ? 'active' : ''}">Comunidade</a>
             <a href="comecar.html" class="nav-link ${currentPath.includes('comecar') ? 'active' : ''}">Começar do Zero</a>
             <a href="sobre.html" class="nav-link ${currentPath.includes('sobre') ? 'active' : ''}">Sobre nós</a>
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="footer-col-title">Produto</div>
                 <div class="footer-links">
                     <a href="comecar.html">Começar do zero</a>
+                    <a href="relatorios.html">Relatórios</a>
                     <a href="principal.html#funcionalidades">Funcionalidades</a>
                     <a href="principal.html#como-funciona">Como funciona</a>
                 </div>

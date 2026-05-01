@@ -109,6 +109,12 @@ body.home-page {
     transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
+.card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .card:hover {
     transform: translateY(-3px);
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12);
