@@ -93,31 +93,37 @@ body.app-page {
 }
 
 .news-filters {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 10px;
+    flex-wrap: wrap;
     margin-bottom: 20px;
-    padding: 3px;
-    border-radius: 999px;
-    background: rgba(27, 27, 27, 0.24);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.10);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .news-filter {
-    min-width: 86px;
-    height: 38px;
-    padding: 0 18px;
-    border: 0;
+    min-width: 54px;
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid rgba(124, 84, 52, 0.42);
     border-radius: 999px;
-    background: transparent;
-    color: rgba(27, 27, 27, 0.88);
-    font-size: 15px;
+    background: rgba(255, 255, 255, 0.92);
+    color: rgba(27, 27, 27, 0.86);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0;
     cursor: pointer;
+    box-shadow: none;
 }
 
 .news-filter.active {
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: rgba(124, 84, 52, 0.88);
+    color: rgba(255, 255, 255, 0.98);
+    border-color: rgba(124, 84, 52, 0.88);
+    box-shadow: none;
 }
 
 .filter-tab {
