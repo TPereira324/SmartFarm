@@ -244,34 +244,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fetchWeather = async (city) => {
         const cityName = String(city || '').trim() || 'Lisboa';
         try {
-            return await fetchWeatherFromOpenMeteo(cityName);
+            const climate = await fetchWeatherFromOpenMeteo(cityName);
+            if (climate) return climate;
         } catch {
-            try {
-                const response = await api.fetchJson(`clima?cidade=${encodeURIComponent(cityName)}`);
-                const clima = response?.data || null;
-                if (clima) return clima;
-            } catch { }
-            return null;
         }
+        try {
+            const response = await api.fetchJson(`clima?cidade=${encodeURIComponent(cityName)}`);
+            const clima = response?.data || null;
+            if (clima) return clima;
+        } catch { }
+        return null;
     };
 
-    const pickLocationString = (...sources) => {
-        const fields = ['localizacao', 'par_localizacao', 'cidade', 'city', 'localidade', 'municipio', 'distrito', 'provincia', 'morada', 'endereco', 'nome_fazenda'];
-        for (const source of sources) {
-            for (const field of fields) {
-                const value = String(source?.[field] ?? '').trim();
-                if (value) return value;
-            }
-        }
-        return '';
-    };
+    const getLocationCandidates = (...sources) => {
+        const priorityGroups = [
+            ['localizacao', 'par_localizacao', 'cidade', 'city', 'localidade', 'municipio', 'distrito', 'provincia'],
+            ['morada', 'endereco'],
+            ['nome_fazenda'],
+        ];
+        const candidates = [];
 
-    const buildWeatherContext = (parcela, profile, currentUser) => {
-        const location = pickLocationString(parcela, profile, currentUser);
-        return {
-            location: location || 'Lisboa',
-            source: location ? 'resolved' : 'fallback',
-        };
+        priorityGroups.forEach((fields) => {
+            sources.forEach((source) => {
+                fields.forEach((field) => {
+                    const value = String(source?.[field] ?? '').trim();
+                    if (value && !candidates.includes(value)) candidates.push(value);
+                });
+            });
+        });
+
+        if (!candidates.includes('Lisboa')) candidates.push('Lisboa');
+        return candidates;
     };
 
     const fetchWeatherByLocations = async (parcelas, profile, currentUser) => {
@@ -286,16 +289,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             return cache.get(key);
         };
 
+        const resolveBestWeather = async (...sources) => {
+            const candidates = getLocationCandidates(...sources);
+            for (const location of candidates) {
+                const clima = await fetchCached(location);
+                if (clima) return { clima, location };
+            }
+            return { clima: null, location: 'Lisboa' };
+        };
+
         for (const parcela of Array.isArray(parcelas) ? parcelas : []) {
             const parcelaId = getParcelaId(parcela);
-            const context = buildWeatherContext(parcela, profile, currentUser);
-            weatherByParcelaId[parcelaId] = await fetchCached(context.location);
+            const { clima } = await resolveBestWeather(parcela, profile, currentUser);
+            weatherByParcelaId[parcelaId] = clima;
         }
 
-        const defaultContext = buildWeatherContext((Array.isArray(parcelas) && parcelas[0]) || null, profile, currentUser);
-        const defaultClima = await fetchCached(defaultContext.location);
+        const { clima: defaultClima, location: defaultLocation } = await resolveBestWeather(
+            (Array.isArray(parcelas) && parcelas[0]) || null,
+            profile,
+            currentUser,
+        );
 
-        return { defaultClima, weatherByParcelaId, defaultLocation: defaultContext.location };
+        return { defaultClima, weatherByParcelaId, defaultLocation };
     };
 
     const formatArea = (value) => {
@@ -710,35 +725,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="monitor-cards-grid">
                                 ${createMonitorMetric({
                 icon: 'bi-thermometer-half',
-                label: 'Temperatura do solo',
+                label: 'Temperatura',
                 value: Number.isFinite(temperatura) ? `${Math.round(temperatura)}°C` : 'Sem leitura',
-                detail: Number.isFinite(temperatura) ? `Estimativa via API para ${parcelaWeather?.cidade || 'a localização resolvida'}` : 'Sem temperatura do solo disponível na API',
+                detail: Number.isFinite(temperatura) ? `Base API · solo em ${parcelaWeather?.cidade || 'local resolvido'}` : 'Sem temperatura disponível na API',
                 tone: 'warm',
                 available: Number.isFinite(temperatura),
                 badge: Number.isFinite(temperatura) ? 'API' : 'sem dado',
             })}
                                 ${createMonitorMetric({
                 icon: 'bi-moisture',
-                label: 'Humidade do solo',
+                label: 'Humidade',
                 value: Number.isFinite(humidade) ? `${Math.round(humidade)}%` : 'Sem leitura',
-                detail: Number.isFinite(humidade) ? `Estimativa modelada pela API para ${parcelaWeather?.cidade || 'a localização resolvida'}` : 'Sem humidade do solo disponível na API',
+                detail: Number.isFinite(humidade) ? `Base API · camada superficial em ${parcelaWeather?.cidade || 'local resolvido'}` : 'Sem humidade disponível na API',
                 tone: 'water',
                 available: Number.isFinite(humidade),
                 badge: Number.isFinite(humidade) ? 'API' : 'sem dado',
             })}
                                 ${createMonitorMetric({
-                icon: 'bi-activity',
-                label: 'ET0 hoje',
+                icon: 'bi-cloud-drizzle',
+                label: 'Necessidade de água',
                 value: Number.isFinite(et0) ? `${et0.toFixed(1)} mm` : 'Sem leitura',
-                detail: Number.isFinite(et0) ? 'Evapotranspiração de referência' : 'Sem ET0 disponível',
+                detail: Number.isFinite(et0) ? 'Base API · evapotranspiração do dia' : 'Sem necessidade hídrica disponível',
                 available: Number.isFinite(et0),
                 badge: Number.isFinite(et0) ? 'API' : 'sem dado',
             })}
                                 ${createMonitorMetric({
-                icon: 'bi-speedometer2',
-                label: 'Défice de vapor',
+                icon: 'bi-wind',
+                label: 'Stress do ar',
                 value: Number.isFinite(vpd) ? `${vpd.toFixed(1)} kPa` : 'Sem leitura',
-                detail: Number.isFinite(vpd) ? 'Indicador de stress hídrico atmosférico' : 'Sem VPD disponível',
+                detail: Number.isFinite(vpd) ? 'Base API · pressão atmosférica sobre a planta' : 'Sem índice atmosférico disponível',
                 available: Number.isFinite(vpd),
                 badge: Number.isFinite(vpd) ? 'API' : 'sem dado',
             })}
