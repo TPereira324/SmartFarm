@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const greetingText = document.getElementById('dashboard-greeting-text');
     const parcelasCount = document.getElementById('dashboard-parcelas-count');
     const tarefasCount = document.getElementById('dashboard-tarefas-count');
+    const tarefasLabel = document.getElementById('dashboard-tarefas-label');
     const alertasCount = document.getElementById('dashboard-alertas-count');
     const alertasLabel = document.getElementById('dashboard-alertas-label');
     const parcelasContainer = document.getElementById('dashboard-parcelas-list');
@@ -181,14 +182,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         forecastUrl.searchParams.set('latitude', String(latitude));
         forecastUrl.searchParams.set('longitude', String(longitude));
         forecastUrl.searchParams.set('current', 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code');
-        forecastUrl.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max');
+        forecastUrl.searchParams.set('hourly', 'soil_temperature_0cm,soil_moisture_0_1cm,vapour_pressure_deficit');
+        forecastUrl.searchParams.set('daily', 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,precipitation_sum,et0_fao_evapotranspiration,uv_index_max');
         forecastUrl.searchParams.set('timezone', 'auto');
 
         const forecastRes = await fetch(forecastUrl.toString());
         const forecastData = await forecastRes.json().catch(() => null);
         const current = forecastData?.current || null;
+        const hourly = forecastData?.hourly || null;
         const daily = forecastData?.daily || null;
         if (!current) return null;
+
+        const hourlyTimes = Array.isArray(hourly?.time) ? hourly.time : [];
+        const currentIndex = Math.max(0, hourlyTimes.indexOf(current.time));
+        const getHourlyValue = (key) => {
+            const values = Array.isArray(hourly?.[key]) ? hourly[key] : [];
+            return values[currentIndex] ?? values[0] ?? null;
+        };
 
         const cityLabel = place?.name || name;
         const tempMax = Array.isArray(daily?.temperature_2m_max) ? daily.temperature_2m_max[0] : null;
@@ -199,7 +209,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             temp_max: Array.isArray(daily?.temperature_2m_max) ? daily.temperature_2m_max[index] : null,
             temp_min: Array.isArray(daily?.temperature_2m_min) ? daily.temperature_2m_min[index] : null,
             chuva_probabilidade: Array.isArray(daily?.precipitation_probability_max) ? daily.precipitation_probability_max[index] : null,
+            precipitacao_sum: Array.isArray(daily?.precipitation_sum) ? daily.precipitation_sum[index] : null,
             vento_max: Array.isArray(daily?.wind_speed_10m_max) ? daily.wind_speed_10m_max[index] : null,
+            et0: Array.isArray(daily?.et0_fao_evapotranspiration) ? daily.et0_fao_evapotranspiration[index] : null,
         })) : [];
 
         return {
@@ -213,6 +225,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             weather_code: current.weather_code,
             previsao: forecastDays,
             atualizado_em: current.time || null,
+            agro: {
+                solo_temperatura_0cm: getHourlyValue('soil_temperature_0cm'),
+                solo_humidade_superficie: (() => {
+                    const v = Number(getHourlyValue('soil_moisture_0_1cm'));
+                    return Number.isFinite(v) ? v * 100 : null;
+                })(),
+                deficit_pressao_vapor: getHourlyValue('vapour_pressure_deficit'),
+                evapotranspiracao_ref: Array.isArray(daily?.et0_fao_evapotranspiration) ? daily.et0_fao_evapotranspiration[0] : null,
+                precipitacao_hoje: Array.isArray(daily?.precipitation_sum) ? daily.precipitation_sum[0] : null,
+                uv_max: Array.isArray(daily?.uv_index_max) ? daily.uv_index_max[0] : null,
+                fonte: 'open-meteo-modelado',
+            },
             fonte: 'open-meteo',
         };
     };
@@ -258,6 +282,63 @@ document.addEventListener('DOMContentLoaded', async () => {
             hour: '2-digit',
             minute: '2-digit',
         }).format(date);
+    };
+
+    const isTaskDone = (task) => String(task?.estado || '').toLowerCase().includes('conclu');
+    const getTaskDueDate = (task) => {
+        const date = new Date(task?.data_inicio || task?.dueDate || 0);
+        return Number.isNaN(date.getTime()) ? null : date;
+    };
+    const classifyTasks = (tasks) => {
+        const all = Array.isArray(tasks) ? tasks : [];
+        const now = new Date();
+        const cutoff = endOfDay(now);
+        const pending = all.filter((t) => !isTaskDone(t));
+        const overdueOrToday = [];
+        const upcoming = [];
+        const unscheduled = [];
+
+        pending.forEach((task) => {
+            const due = getTaskDueDate(task);
+            if (!due) {
+                unscheduled.push(task);
+                return;
+            }
+            if (due.getTime() <= cutoff.getTime()) overdueOrToday.push(task);
+            else upcoming.push(task);
+        });
+
+        const sortByDue = (a, b) => {
+            const aTime = getTaskDueDate(a)?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
+            const bTime = getTaskDueDate(b)?.getTime?.() ?? Number.MAX_SAFE_INTEGER;
+            return aTime - bTime;
+        };
+
+        overdueOrToday.sort(sortByDue);
+        upcoming.sort(sortByDue);
+
+        return { pending, overdueOrToday, upcoming, unscheduled };
+    };
+    const formatTaskSectionTitle = (base, list) => list.length ? `${base} (${list.length})` : base;
+    const createTaskRowMarkup = (tarefa, interactive = true) => {
+        const dueText = formatShortDateTime(tarefa.data_inicio);
+        const tipo = String(tarefa?.tipo || tarefa?.categoria || 'Tarefa').trim();
+        const label = tipo ? `${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}` : 'Tarefa';
+        const tag = getTaskDueDate(tarefa) ? label : 'Sem data';
+        const rowClass = interactive ? 'dash-task-row' : 'dash-task-row dash-task-row-static';
+        const attr = interactive ? `data-task-id="${String(tarefa.id || '')}"` : '';
+        return `
+            <button type="button" class="${rowClass}" ${attr}>
+                <div class="dash-task-main">
+                    <div class="dash-task-title-row">
+                        <div class="dash-task-title">${tarefa.titulo || 'Tarefa'}</div>
+                        <span class="dash-task-tag">${tag}</span>
+                    </div>
+                    <div class="dash-task-sub">${tarefa.parcela_nome || 'Sem parcela'} · ${dueText}</div>
+                </div>
+                <span class="dash-task-check ${isTaskDone(tarefa) ? 'is-done' : ''}" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
+            </button>
+        `;
     };
 
     const tasksStorageKey = 'cocoRootTasks';
@@ -439,42 +520,100 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const renderTasks = (tasks, options = {}) => {
         if (!tarefasContainer) return;
-        const all = Array.isArray(tasks) ? tasks : [];
-        const showOnlyToday = options.onlyToday !== false;
-        const now = new Date();
-        const cutoff = endOfDay(now);
+        const sections = classifyTasks(tasks);
+        const showOnlyToday = options.onlyToday === true;
+        const interactive = options.interactive !== false;
+        const visibleNow = showOnlyToday ? sections.overdueOrToday : sections.pending;
 
-        const isDone = (task) => String(task?.estado || '').toLowerCase().includes('conclu');
-        const due = (task) => new Date(task?.data_inicio || task?.dueDate || 0);
-
-        const visible = showOnlyToday
-            ? all.filter((t) => !isDone(t) && due(t).getTime() <= cutoff.getTime())
-            : all.filter((t) => !isDone(t));
-
-        visible.sort((a, b) => due(a).getTime() - due(b).getTime());
-
-        if (visible.length === 0) {
-            renderEmpty(tarefasContainer, 'Sem tarefas para hoje. Registe um cultivo para gerar tarefas automaticamente.');
+        if (sections.pending.length === 0) {
+            renderEmpty(tarefasContainer, 'Sem tarefas pendentes. Quando registares ou planeares novos cultivos, as tarefas aparecem aqui.');
             return;
         }
 
-        tarefasContainer.innerHTML = visible.map((tarefa) => {
-            const dueText = formatShortDateTime(tarefa.data_inicio);
-            const tipo = String(tarefa?.tipo || tarefa?.categoria || 'Tarefa').trim();
-            const label = tipo ? `${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}` : 'Tarefa';
-            return `
-                <button type="button" class="dash-task-row" data-task-id="${String(tarefa.id || '')}">
-                    <div class="dash-task-main">
-                        <div class="dash-task-title-row">
-                            <div class="dash-task-title">${tarefa.titulo || 'Tarefa'}</div>
-                            <span class="dash-task-tag">${label}</span>
+        const summaryText = sections.overdueOrToday.length > 0
+            ? `Tens ${sections.overdueOrToday.length} tarefa(s) para tratar até hoje e ${sections.upcoming.length} próxima(s) a seguir.`
+            : `Não tens tarefas para hoje, mas ainda existem ${sections.upcoming.length} tarefa(s) pendente(s) agendada(s).`;
+
+        const blocks = [];
+        if (visibleNow.length > 0) {
+            blocks.push(`
+                <section class="dash-task-section">
+                    <div class="dash-task-section-title">${formatTaskSectionTitle(showOnlyToday ? 'Para hoje e em atraso' : 'Pendentes', visibleNow)}</div>
+                    ${visibleNow.map((tarefa) => createTaskRowMarkup(tarefa, interactive)).join('')}
+                </section>
+            `);
+        }
+        if (!showOnlyToday && sections.upcoming.length > 0) {
+            blocks.push(`
+                <section class="dash-task-section">
+                    <div class="dash-task-section-title">${formatTaskSectionTitle('Próximas', sections.upcoming)}</div>
+                    ${sections.upcoming.map((tarefa) => createTaskRowMarkup(tarefa, interactive)).join('')}
+                </section>
+            `);
+        } else if (showOnlyToday && sections.upcoming.length > 0) {
+            blocks.push(`
+                <section class="dash-task-section">
+                    <div class="dash-task-section-title">${formatTaskSectionTitle('Próximas', sections.upcoming.slice(0, 4))}</div>
+                    ${sections.upcoming.slice(0, 4).map((tarefa) => createTaskRowMarkup(tarefa, interactive)).join('')}
+                </section>
+            `);
+        }
+        if (sections.unscheduled.length > 0) {
+            blocks.push(`
+                <section class="dash-task-section">
+                    <div class="dash-task-section-title">${formatTaskSectionTitle('Sem data definida', sections.unscheduled)}</div>
+                    ${sections.unscheduled.map((tarefa) => createTaskRowMarkup(tarefa, interactive)).join('')}
+                </section>
+            `);
+        }
+
+        tarefasContainer.innerHTML = `
+            <div class="dash-task-summary">${summaryText}</div>
+            <div class="dash-task-sections">${blocks.join('')}</div>
+        `;
+    };
+
+    const renderModelBasedMetrics = (clima) => {
+        const agro = clima?.agro || {};
+        const cards = [
+            {
+                label: 'Temperatura do solo',
+                value: Number.isFinite(Number(agro.solo_temperatura_0cm)) ? `${Math.round(Number(agro.solo_temperatura_0cm))}°C` : 'Sem dado',
+                sub: 'Estimativa climática a 0 cm',
+            },
+            {
+                label: 'Humidade do solo',
+                value: Number.isFinite(Number(agro.solo_humidade_superficie)) ? `${Math.round(Number(agro.solo_humidade_superficie))}%` : 'Sem dado',
+                sub: 'Estimativa modelada da camada superficial',
+            },
+            {
+                label: 'ET0 hoje',
+                value: Number.isFinite(Number(agro.evapotranspiracao_ref)) ? `${Number(agro.evapotranspiracao_ref).toFixed(1)} mm` : 'Sem dado',
+                sub: 'Evapotranspiração de referência',
+            },
+            {
+                label: 'Défice de vapor',
+                value: Number.isFinite(Number(agro.deficit_pressao_vapor)) ? `${Number(agro.deficit_pressao_vapor).toFixed(1)} kPa` : 'Sem dado',
+                sub: 'Indicador de stress hídrico atmosférico',
+            },
+        ];
+
+        if (!cards.some((card) => card.value !== 'Sem dado')) return '';
+
+        return `
+            <div class="monitor-model-section">
+                <div class="monitor-model-title">Base climática sem IoT</div>
+                <div class="monitor-model-grid">
+                    ${cards.map((card) => `
+                        <div class="monitor-model-card">
+                            <div class="monitor-model-card-label">${card.label}</div>
+                            <div class="monitor-model-card-value">${card.value}</div>
+                            <div class="monitor-model-card-sub">${card.sub}</div>
                         </div>
-                        <div class="dash-task-sub">${tarefa.parcela_nome || 'Sem parcela'} · ${dueText}</div>
-                    </div>
-                    <span class="dash-task-check" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
-                </button>
-            `;
-        }).join('');
+                    `).join('')}
+                </div>
+            </div>
+        `;
     };
 
     const formatWeekdayShort = (value) => {
@@ -522,13 +661,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderMonitorizacao = (parcelas, clima, alertas) => {
         if (!monitorizacaoContainer) return;
         const list = Array.isArray(parcelas) ? parcelas : [];
-
-        if (list.length === 0) {
-            renderEmpty(monitorizacaoContainer, 'Registe parcelas para acompanhar a monitorização.');
-            return;
-        }
-
+        const alertsCard = renderAlertsCard(alertas);
         monitorizacaoContainer.innerHTML = `
+            <div class="monitor-top-grid">
+                ${alertsCard}
+                <div class="dash-card">
+                    <div class="dash-card-title">Base da Monitorização</div>
+                    <div style="color:var(--muted);line-height:1.7;">
+                        A monitorização usa dados reais da parcela quando existirem e, na ausência de sensores, complementa com dados modelados de clima e solo.
+                    </div>
+                </div>
+            </div>
+            ${list.length === 0 ? '<div class="dash-card"><div style="color:var(--muted);line-height:1.6;">Registe parcelas para acompanhar a monitorização.</div></div>' : `
             <div class="monitor-accordion">
                 ${list.map((parcela, index) => {
             const cultivos = Array.isArray(parcela?.cultivos) ? parcela.cultivos : [];
@@ -600,12 +744,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 available: Number.isFinite(ec),
             })}
                             </div>
+                            ${renderModelBasedMetrics(clima)}
                             ${hasAnyReading ? '' : '<div class="monitor-panel-note">Esta parcela ainda não tem leituras de sensores associadas na API atual.</div>'}
                         </div>
                     </section>
                 `;
         }).join('')}
             </div>
+            `}
         `;
 
         if (!monitorizacaoContainer.dataset.monitorBound) {
@@ -884,6 +1030,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         return alerts;
     };
 
+    const updateTaskSummary = (tasks) => {
+        const sections = classifyTasks(tasks);
+        if (tarefasCount) tarefasCount.textContent = String(sections.pending.length);
+        if (tarefasLabel) {
+            if (sections.pending.length === 0) tarefasLabel.textContent = 'Tudo em dia';
+            else tarefasLabel.textContent = `${sections.overdueOrToday.length} até hoje · ${sections.upcoming.length} próximas`;
+        }
+    };
+
+    const updateAlertsSummary = (alerts) => {
+        const list = Array.isArray(alerts) ? alerts : [];
+        if (alertasCount) alertasCount.textContent = String(list.length);
+        if (alertasLabel) {
+            if (list.length === 0) {
+                alertasLabel.textContent = 'Sem alertas';
+                return;
+            }
+            const top = list[0];
+            const category = getAlertCategory(top);
+            const title = getAlertTitle(top);
+            alertasLabel.textContent = `${category} · ${title}`;
+        }
+    };
+
     try {
         const [parcelasResponse, tarefasResponse, alertasResponse, clima] = await Promise.all([
             api.fetchJson(`parcelas/listar/${user.id}`),
@@ -899,8 +1069,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const localAlertas = getUserLocalAlerts(userId);
 
         if (parcelasCount) parcelasCount.textContent = String(parcelas.length);
-        if (alertasCount) alertasCount.textContent = String(serverAlertas.length + localAlertas.length);
-        if (alertasLabel) alertasLabel.textContent = '';
 
         if (parcelas.length === 0) {
             renderParcelas(parcelas);
@@ -917,6 +1085,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             tarefas = merged;
             setUserTasks(store, userId, merged);
 
+            const refreshComputedSections = (currentTasks) => {
+                updateTaskSummary(currentTasks);
+                const generatedAlertas = generateAlerts({ parcelas, tarefas: currentTasks, clima });
+                const mergedAlertas = mergeAlerts(serverAlertas, localAlertas, generatedAlertas);
+                updateAlertsSummary(mergedAlertas);
+                renderMonitorizacao(parcelas, clima, mergedAlertas);
+                return mergedAlertas;
+            };
+
             if (tarefasContainer) {
                 if (!tarefasContainer.dataset.tasksBound) {
                     tarefasContainer.dataset.tasksBound = '1';
@@ -931,35 +1108,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                         });
                         setUserTasks(currentStore, userId, nextTasks);
                         renderTasks(nextTasks, { onlyToday: true });
-                        if (tarefasCount) {
-                            const pending = nextTasks.filter((t) => !String(t?.estado || '').toLowerCase().includes('conclu')).length;
-                            tarefasCount.textContent = String(pending);
-                        }
+                        refreshComputedSections(nextTasks);
                     });
                 }
             }
-        }
 
-        if (tarefasCount) {
-            const pending = tarefas.filter((t) => !String(t?.estado || '').toLowerCase().includes('conclu')).length;
-            tarefasCount.textContent = String(pending);
+            refreshComputedSections(tarefas);
         }
 
         if (hasServerTasks) {
-            if (tarefasContainer) {
-                tarefasContainer.innerHTML = tarefas.map((tarefa) => `
-                    <div class="dash-task-row dash-task-row-static">
-                        <div class="dash-task-main">
-                            <div class="dash-task-title-row">
-                                <div class="dash-task-title">${tarefa.titulo || 'Tarefa'}</div>
-                                <span class="dash-task-tag">${String(tarefa.tipo || tarefa.categoria || 'Tarefa')}</span>
-                            </div>
-                            <div class="dash-task-sub">${tarefa.parcela_nome || 'Sem parcela'} · ${formatDate(tarefa.data_inicio)}</div>
-                        </div>
-                        <span class="dash-task-check ${String(tarefa.estado || '').toLowerCase().includes('conclu') ? 'is-done' : ''}" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
-                    </div>
-                `).join('');
-            }
+            updateTaskSummary(tarefas);
+            renderTasks(tarefas, { onlyToday: false, interactive: false });
         } else {
             renderTasks(tarefas, { onlyToday: true });
         }
@@ -967,11 +1126,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const generatedAlertas = generateAlerts({ parcelas, tarefas, clima });
         const alertas = mergeAlerts(serverAlertas, localAlertas, generatedAlertas);
 
-        if (alertasCount) alertasCount.textContent = String(Array.isArray(alertas) ? alertas.length : 0);
-        if (alertasLabel) {
-            alertasLabel.textContent = '';
-        }
-
+        updateTaskSummary(tarefas);
+        updateAlertsSummary(alertas);
         renderMonitorizacao(parcelas, clima, alertas);
         renderClima(clima);
 
@@ -980,6 +1136,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (parcelasCount) parcelasCount.textContent = '0';
         if (tarefasCount) tarefasCount.textContent = '0';
         if (alertasCount) alertasCount.textContent = '0';
+        if (tarefasLabel) tarefasLabel.textContent = 'Sem tarefas';
+        if (alertasLabel) alertasLabel.textContent = 'Sem alertas';
         renderEmpty(parcelasContainer, 'Não foi possível carregar as parcelas da base de dados.');
         renderEmpty(tarefasContainer, 'As tarefas não puderam ser carregadas.');
         renderEmpty(monitorizacaoContainer, 'O monitoramento não está disponível.');
