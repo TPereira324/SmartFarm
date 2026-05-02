@@ -31,41 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const prefComunidade = document.getElementById('pref-comunidade');
 
     const fetchOptional = async (path) => {
-        try {
-            return await api.fetchJson(path);
-        } catch {
-            return null;
-        }
-    };
-    const friendlyError = (error, fallback) => {
-        const text = String(error?.message || '').toLowerCase();
-        if (text.includes('failed to fetch') || text.includes('networkerror') || text.includes('load failed')) {
-            return 'Sem ligação ao servidor neste momento. Tente novamente em alguns segundos.';
-        }
-        return error?.message || fallback;
-    };
-
-    const readJson = (key, fallback) => {
-        try {
-            const raw = localStorage.getItem(key);
-            return raw ? JSON.parse(raw) : fallback;
-        } catch {
-            return fallback;
-        }
-    };
-
-    const writeJson = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-
-    const toUserShape = (raw) => {
-        const source = raw && typeof raw === 'object' ? raw : {};
-        return {
-            id: source.id ?? source.ut_id ?? source.user_id ?? liveUser.id,
-            role: source.role ?? source.ut_role ?? liveUser.role,
-            nome: source.nome ?? source.ut_nome ?? source.name ?? liveUser.nome ?? '',
-            email: source.email ?? source.ut_email ?? liveUser.email ?? '',
-            telefone: source.telefone ?? source.phone ?? source.ut_phone ?? liveUser.telefone ?? '',
-            localizacao: source.localizacao ?? source.cidade ?? source.morada ?? source.endereco ?? liveUser.localizacao ?? '',
-        };
+        try { return await api.fetchJson(path); } catch { return null; }
     };
 
     const updateIdentityUI = () => {
@@ -74,31 +40,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         inputPhone.value = liveUser.telefone || '';
         inputLocation.value = liveUser.localizacao || '';
         const initials = String(liveUser.nome || 'U')
-            .split(' ')
-            .filter(Boolean)
-            .slice(0, 2)
-            .map((w) => w[0]?.toUpperCase() || '')
-            .join('');
+            .split(' ').filter(Boolean).slice(0, 2)
+            .map((w) => w[0]?.toUpperCase() || '').join('');
         avatar.textContent = initials || 'U';
         profileName.textContent = liveUser.nome || 'Utilizador';
         profileRole.textContent = liveUser.role === 'admin' ? 'Administrador' : 'Produtor CocoRoot';
     };
 
     const initIdentity = () => {
-        liveUser = toUserShape(liveUser);
+        liveUser = toUserShape(liveUser, liveUser);
         updateIdentityUI();
     };
 
     const initPreferences = () => {
-        const prefs = readJson(preferencesKey, {
-            alertas: true,
-            resumo: true,
-            comunidade: true,
-        });
+        const prefs = readJson(preferencesKey, { alertas: true, resumo: true, comunidade: true });
         prefAlertas.checked = prefs.alertas !== false;
         prefResumo.checked = prefs.resumo !== false;
         prefComunidade.checked = prefs.comunidade !== false;
-
         [prefAlertas, prefResumo, prefComunidade].forEach((el) => {
             el?.addEventListener('change', () => {
                 writeJson(preferencesKey, {
@@ -145,13 +103,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
     };
 
-    const calcProgress = (parcelas, tarefasPendentes, modulosConcluidos) => {
-        const parcelaScore = Math.min(100, parcelas * 20);
-        const moduloScore = Math.min(100, modulosConcluidos * 25);
-        const taskScore = Math.max(0, 100 - (tarefasPendentes * 8));
-        return Math.round((parcelaScore * 0.35) + (moduloScore * 0.35) + (taskScore * 0.3));
-    };
-
     const loadStats = async () => {
         const userId = String(liveUser.id ?? user.id ?? 'anon');
         const completedModulesStore = readJson('cocoRootCompletedModules', {});
@@ -163,9 +114,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             fetchOptional(`tarefas/listar/${liveUser.id}`),
             fetchOptional(`alertas/listar/${liveUser.id}`),
         ]);
+
         const remoteProfile = perfilResponse?.data || perfilResponse?.user || null;
         if (remoteProfile) {
-            liveUser = toUserShape(remoteProfile);
+            liveUser = toUserShape(remoteProfile, liveUser);
             localStorage.setItem('user', JSON.stringify(liveUser));
             updateIdentityUI();
         }
@@ -188,46 +140,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const alerts = Array.isArray(alertasResponse?.data) ? alertasResponse.data : [];
         const activities = [];
         allTasks.slice(0, 2).forEach((task) => {
-            activities.push({
-                title: task?.titulo || 'Tarefa atualizada',
-                meta: `${task?.parcela_nome || 'Sem parcela'} · ${task?.estado || 'Pendente'}`,
-            });
+            activities.push({ title: task?.titulo || 'Tarefa atualizada', meta: `${task?.parcela_nome || 'Sem parcela'} · ${task?.estado || 'Pendente'}` });
         });
         alerts.slice(0, 2).forEach((alert) => {
-            activities.push({
-                title: alert?.titulo || 'Alerta do sistema',
-                meta: alert?.mensagem || alert?.message || 'Nova notificação recebida',
-            });
+            activities.push({ title: alert?.titulo || 'Alerta do sistema', meta: alert?.mensagem || alert?.message || 'Nova notificação recebida' });
         });
-        if (activities.length === 0) {
-            activities.push({
-                title: 'Perfil criado',
-                meta: 'Complete seus dados para personalizar a experiência.',
-            });
-        }
+        if (activities.length === 0) activities.push({ title: 'Perfil criado', meta: 'Complete seus dados para personalizar a experiência.' });
         renderActivity(activities);
     };
 
     const saveProfile = async () => {
-        const nextUser = toUserShape({
-            ...liveUser,
-            nome: inputName.value.trim(),
-            email: inputEmail.value.trim(),
-            telefone: inputPhone.value.trim(),
-            localizacao: inputLocation.value.trim(),
-        });
-        const payload = {
-            id: nextUser.id,
-            nome: nextUser.nome,
-            email: nextUser.email,
-            telefone: nextUser.telefone,
-            localizacao: nextUser.localizacao,
-            cidade: nextUser.localizacao,
-            ut_nome: nextUser.nome,
-            ut_email: nextUser.email,
-            ut_phone: nextUser.telefone,
-            ut_localizacao: nextUser.localizacao,
-        };
+        const nextUser = toUserShape({ ...liveUser, nome: inputName.value.trim(), email: inputEmail.value.trim(), telefone: inputPhone.value.trim(), localizacao: inputLocation.value.trim() }, liveUser);
+        const payload = { id: nextUser.id, nome: nextUser.nome, email: nextUser.email, telefone: nextUser.telefone, localizacao: nextUser.localizacao, cidade: nextUser.localizacao, ut_nome: nextUser.nome, ut_email: nextUser.email, ut_phone: nextUser.telefone, ut_localizacao: nextUser.localizacao };
         const attempts = [
             { path: `usuarios/atualizar/${nextUser.id}`, method: 'POST' },
             { path: 'usuarios/atualizar', method: 'POST' },
@@ -235,42 +159,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             { path: 'usuarios/perfil', method: 'POST' },
             { path: `usuarios/atualizar/${nextUser.id}`, method: 'PUT' },
         ];
-
         let saved = false;
         let lastError = null;
         for (const attempt of attempts) {
             try {
-                const response = await api.fetchJson(attempt.path, {
-                    method: attempt.method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const ok = response?.success !== false;
-                if (ok) {
-                    saved = true;
-                    break;
-                }
+                const response = await api.fetchJson(attempt.path, { method: attempt.method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (response?.success !== false) { saved = true; break; }
                 lastError = new Error(response?.message || 'Falha ao atualizar perfil.');
-            } catch (error) {
-                lastError = error;
-            }
+            } catch (error) { lastError = error; }
         }
-
-        if (!saved) {
-            throw new Error(friendlyError(lastError, 'Não foi possível salvar no servidor.'));
-        }
-
+        if (!saved) throw new Error(friendlyError(lastError, 'Não foi possível salvar no servidor.'));
         liveUser = nextUser;
         localStorage.setItem('user', JSON.stringify(liveUser));
         updateIdentityUI();
-
         if (saveStatus) {
             saveStatus.hidden = false;
             saveStatus.textContent = 'Perfil atualizado com sucesso.';
-            setTimeout(() => {
-                saveStatus.hidden = true;
-                saveStatus.textContent = '';
-            }, 2500);
+            setTimeout(() => { saveStatus.hidden = true; saveStatus.textContent = ''; }, 2500);
         }
         if (window.CocoRootToast) window.CocoRootToast('Perfil', 'Dados guardados');
     };
@@ -278,27 +183,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     initIdentity();
     initPreferences();
     initInterests();
-    try {
-        await loadStats();
-    } catch {
-    }
+    try { await loadStats(); } catch {}
+
     saveBtn?.addEventListener('click', async () => {
         saveBtn.disabled = true;
-        if (saveStatus) {
-            saveStatus.hidden = false;
-            saveStatus.textContent = 'A guardar alterações na base de dados...';
-        }
+        if (saveStatus) { saveStatus.hidden = false; saveStatus.textContent = 'A guardar alterações na base de dados...'; }
         try {
             await saveProfile();
             await loadStats();
         } catch (error) {
-            if (saveStatus) {
-                saveStatus.hidden = false;
-                saveStatus.textContent = friendlyError(error, 'Falha ao salvar perfil na base de dados.');
-            }
+            if (saveStatus) { saveStatus.hidden = false; saveStatus.textContent = friendlyError(error, 'Falha ao salvar perfil na base de dados.'); }
             if (window.CocoRootToast) window.CocoRootToast('Perfil', 'Erro ao guardar dados');
-        } finally {
-            saveBtn.disabled = false;
-        }
+        } finally { saveBtn.disabled = false; }
     });
 });
