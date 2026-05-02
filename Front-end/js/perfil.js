@@ -30,43 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const prefResumo = document.getElementById('pref-resumo');
     const prefComunidade = document.getElementById('pref-comunidade');
 
-    const fetchOptional = async (path) => {
-        try {
-            return await api.fetchJson(path);
-        } catch {
-            return null;
-        }
-    };
-    const friendlyError = (error, fallback) => {
-        const text = String(error?.message || '').toLowerCase();
-        if (text.includes('failed to fetch') || text.includes('networkerror') || text.includes('load failed')) {
-            return 'Sem ligação ao servidor neste momento. Tente novamente em alguns segundos.';
-        }
-        return error?.message || fallback;
-    };
-
-    const readJson = (key, fallback) => {
-        try {
-            const raw = localStorage.getItem(key);
-            return raw ? JSON.parse(raw) : fallback;
-        } catch {
-            return fallback;
-        }
-    };
-
-    const writeJson = (key, value) => localStorage.setItem(key, JSON.stringify(value));
-
-    const toUserShape = (raw) => {
-        const source = raw && typeof raw === 'object' ? raw : {};
-        return {
-            id: source.id ?? source.ut_id ?? source.user_id ?? liveUser.id,
-            role: source.role ?? source.ut_role ?? liveUser.role,
-            nome: source.nome ?? source.ut_nome ?? source.name ?? liveUser.nome ?? '',
-            email: source.email ?? source.ut_email ?? liveUser.email ?? '',
-            telefone: source.telefone ?? source.phone ?? source.ut_phone ?? liveUser.telefone ?? '',
-            localizacao: source.localizacao ?? source.cidade ?? source.morada ?? source.endereco ?? liveUser.localizacao ?? '',
-        };
-    };
+    const { fetchOptional, friendlyError, readJson, writeJson, toUserShape, calcProgress, renderActivity } = window.CocoRootPerfilAPI;
 
     const updateIdentityUI = () => {
         inputName.value = liveUser.nome || '';
@@ -85,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     const initIdentity = () => {
-        liveUser = toUserShape(liveUser);
+        liveUser = toUserShape(liveUser, liveUser);
         updateIdentityUI();
     };
 
@@ -129,28 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     };
 
-    const renderActivity = (items) => {
-        if (!Array.isArray(items) || items.length === 0) {
-            activityRoot.innerHTML = '<div class="profile-activity-empty">Sem atividade recente.</div>';
-            return;
-        }
-        activityRoot.innerHTML = items.map((item) => `
-            <article class="profile-activity-item">
-                <div class="profile-activity-dot"></div>
-                <div>
-                    <div class="profile-activity-title">${item.title}</div>
-                    <div class="profile-activity-meta">${item.meta}</div>
-                </div>
-            </article>
-        `).join('');
-    };
 
-    const calcProgress = (parcelas, tarefasPendentes, modulosConcluidos) => {
-        const parcelaScore = Math.min(100, parcelas * 20);
-        const moduloScore = Math.min(100, modulosConcluidos * 25);
-        const taskScore = Math.max(0, 100 - (tarefasPendentes * 8));
-        return Math.round((parcelaScore * 0.35) + (moduloScore * 0.35) + (taskScore * 0.3));
-    };
 
     const loadStats = async () => {
         const userId = String(liveUser.id ?? user.id ?? 'anon');
@@ -158,14 +101,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const localTasksStore = readJson('cocoRootTasks', {});
 
         const [perfilResponse, parcelasResponse, tarefasResponse, alertasResponse] = await Promise.all([
-            fetchOptional(`usuarios/perfil/${liveUser.id}`),
-            fetchOptional(`parcelas/listar/${liveUser.id}`),
-            fetchOptional(`tarefas/listar/${liveUser.id}`),
-            fetchOptional(`alertas/listar/${liveUser.id}`),
+            fetchOptional(api, `usuarios/perfil/${liveUser.id}`),
+            fetchOptional(api, `parcelas/listar/${liveUser.id}`),
+            fetchOptional(api, `tarefas/listar/${liveUser.id}`),
+            fetchOptional(api, `alertas/listar/${liveUser.id}`),
         ]);
         const remoteProfile = perfilResponse?.data || perfilResponse?.user || null;
         if (remoteProfile) {
-            liveUser = toUserShape(remoteProfile);
+            liveUser = toUserShape(remoteProfile, liveUser);
             localStorage.setItem('user', JSON.stringify(liveUser));
             updateIdentityUI();
         }
@@ -205,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 meta: 'Complete seus dados para personalizar a experiência.',
             });
         }
-        renderActivity(activities);
+        renderActivity(activities, activityRoot);
     };
 
     const saveProfile = async () => {
@@ -215,7 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             email: inputEmail.value.trim(),
             telefone: inputPhone.value.trim(),
             localizacao: inputLocation.value.trim(),
-        });
+        }, liveUser);
         const payload = {
             id: nextUser.id,
             nome: nextUser.nome,

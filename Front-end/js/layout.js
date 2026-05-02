@@ -70,14 +70,14 @@ document.addEventListener("DOMContentLoaded", () => {
     </footer>
     `;
 
-   
+
     if (!document.body.classList.contains('auth-page') && !document.querySelector('.nav')) {
         document.body.insertAdjacentHTML('afterbegin', headerHTML);
     } else if (document.querySelector('.nav')) {
         document.querySelector('.nav').outerHTML = headerHTML;
     }
 
-    
+
     if (!document.body.classList.contains('auth-page')) {
         if (document.querySelector('.footer')) {
             document.querySelector('.footer').outerHTML = footerHTML;
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    
+
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', (e) => {

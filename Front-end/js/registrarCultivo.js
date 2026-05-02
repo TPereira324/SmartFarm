@@ -19,6 +19,9 @@
     const summaryTipo = document.querySelector('[data-summary-tipo]');
     const summaryObjetivo = document.querySelector('[data-summary-objetivo]');
     const summaryMetodo = document.querySelector('[data-summary-metodo]');
+    const summarySubstratoRow = document.getElementById('summary-substrato-row');
+    const summarySubstrato = document.querySelector('[data-summary-substrato]');
+    const substratoCalc = document.getElementById('substrato-calc');
 
     const state = {
         step: 1,
@@ -77,6 +80,22 @@
         return Number.isFinite(n) ? n : NaN;
     };
 
+    const updateSubstrate = () => {
+        const l = getNumber(el.largura);
+        const c = getNumber(el.comprimento);
+        const p = getNumber(el.profundidade);
+        if (Number.isFinite(l) && Number.isFinite(c) && Number.isFinite(p) && l > 0 && c > 0 && p > 0) {
+            const vol = l * c * p * 1000;
+            if (substratoCalc) substratoCalc.textContent = `${vol.toFixed(1)} Litros`;
+        } else {
+            if (substratoCalc) substratoCalc.textContent = '0.0 Litros';
+        }
+    };
+
+    el.largura?.addEventListener('input', updateSubstrate);
+    el.comprimento?.addEventListener('input', updateSubstrate);
+    el.profundidade?.addEventListener('input', updateSubstrate);
+
     const syncState = () => {
         state.largura = (el.largura?.value || '').trim();
         state.comprimento = (el.comprimento?.value || '').trim();
@@ -113,6 +132,21 @@
         if (summaryTipo) summaryTipo.textContent = state.tipo || '—';
         if (summaryObjetivo) summaryObjetivo.textContent = state.objetivo || '—';
         if (summaryMetodo) summaryMetodo.textContent = state.metodo || '—';
+        if (summarySubstrato) {
+            if (state.metodo === 'Hidroponia') {
+                summarySubstrato.textContent = 'Não aplicável (Hidroponia)';
+            } else {
+                const l = getNumber(el.largura);
+                const c = getNumber(el.comprimento);
+                const p = getNumber(el.profundidade);
+                if (Number.isFinite(l) && Number.isFinite(c) && Number.isFinite(p) && l > 0 && c > 0 && p > 0) {
+                    const vol = l * c * p * 1000;
+                    summarySubstrato.textContent = `${vol.toFixed(1)} Litros`;
+                } else {
+                    summarySubstrato.textContent = '—';
+                }
+            }
+        }
     };
 
     const showStep = (n) => {
