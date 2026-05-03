@@ -12,7 +12,7 @@ function renderParcelas(parcelas, parcelasContainer) {
             <a href="registrar-cultivo.html" class="dash-add-card"><span class="dash-add-icon" aria-hidden="true">+</span><span>Adicionar cultivo</span></a>`;
         return;
     }
-    const cards = list.map((parcela) => {
+    const cards = list.map((parcela, index) => {
         const cultivos = Array.isArray(parcela.cultivos) ? parcela.cultivos : [];
         const cultivo = cultivos[0];
         const cultivoNome = String(cultivo?.nome ?? parcela?.tipo ?? parcela?.cultivo ?? parcela?.cultivo_nome ?? parcela?.nome ?? '').trim();
@@ -20,8 +20,8 @@ function renderParcelas(parcelas, parcelasContainer) {
         const has = (...words) => words.some((w) => cultivoNorm.includes(normalizeText(w)));
         const iconClass = has('alface', 'couve', 'espinafre', 'rúcula', 'rucula', 'repolho') ? 'dash-cultivo-icon--folhosas'
             : has('tomate', 'pimento', 'pepino', 'abobrinha', 'courgette', 'beringela', 'melancia', 'melao', 'melão', 'morango') ? 'dash-cultivo-icon--frutiferas'
-            : has('manjericão', 'manjericao', 'hortelã', 'hortela', 'salsa', 'coentros', 'alecrim', 'orégãos', 'oregãos', 'oregano', 'cebolinho') ? 'dash-cultivo-icon--ervas'
-            : has('batata', 'cenoura', 'beterraba', 'nabo', 'rabanete') ? 'dash-cultivo-icon--raizes' : 'dash-cultivo-icon--geral';
+                : has('manjericão', 'manjericao', 'hortelã', 'hortela', 'salsa', 'coentros', 'alecrim', 'orégãos', 'oregãos', 'oregano', 'cebolinho') ? 'dash-cultivo-icon--ervas'
+                    : has('batata', 'cenoura', 'beterraba', 'nabo', 'rabanete') ? 'dash-cultivo-icon--raizes' : 'dash-cultivo-icon--geral';
         const cultivoIcon = (() => {
             if (!cultivoNome) return 'C';
             if (has('morango')) return '🍓';
@@ -60,7 +60,7 @@ function renderParcelas(parcelas, parcelasContainer) {
                     <div class="dash-cultivo-metric"><span>EC</span><strong>${ecText}</strong></div>
                     <div class="dash-cultivo-metric"><span>Humidade</span><strong>${humidadeText}</strong></div>
                 </div>
-                <button type="button" class="dash-cultivo-link">Ver Detalhes</button>
+                <button type="button" class="dash-cultivo-link" data-parcela-id="${getParcelaId(parcela)}">Ver Detalhes</button>
             </article>`;
     }).join('');
     parcelasContainer.innerHTML = `${cards}<a href="registrar-cultivo.html" class="dash-add-card"><span class="dash-add-icon" aria-hidden="true">+</span><span>Adicionar cultivo</span></a>`;
@@ -92,11 +92,11 @@ function renderClima(clima, climaContainer) {
             </div>
             <div class="weather-forecast-grid">
                 ${forecast.map((dia) => {
-                    const max = Number(dia?.temp_max), min = Number(dia?.temp_min);
-                    const chuva = Number(dia?.chuva_probabilidade), vento = Number(dia?.vento_max);
-                    const iconName = weatherCodeToIcon(dia?.weather_code);
-                    const baseTemp = Number.isFinite(max) ? Math.round(max) : (Number.isFinite(min) ? Math.round(min) : null);
-                    return `<article class="weather-day-card">
+        const max = Number(dia?.temp_max), min = Number(dia?.temp_min);
+        const chuva = Number(dia?.chuva_probabilidade), vento = Number(dia?.vento_max);
+        const iconName = weatherCodeToIcon(dia?.weather_code);
+        const baseTemp = Number.isFinite(max) ? Math.round(max) : (Number.isFinite(min) ? Math.round(min) : null);
+        return `<article class="weather-day-card">
                         <div class="weather-day-name">${formatWeekdayShort(dia?.data)}</div>
                         <div class="weather-day-icon"><i class="bi ${iconName}" aria-hidden="true"></i></div>
                         <div class="weather-day-temp">${baseTemp !== null ? `${baseTemp}°C` : '—'}</div>
@@ -106,7 +106,7 @@ function renderClima(clima, climaContainer) {
                             <span><i class="bi bi-wind" aria-hidden="true"></i> ${Number.isFinite(vento) ? `${Math.round(vento)} km/h` : '0 km/h'}</span>
                         </div>
                     </article>`;
-                }).join('')}
+    }).join('')}
             </div>
         </div>`;
 }

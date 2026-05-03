@@ -62,6 +62,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (parcelasCount) parcelasCount.textContent = String(parcelas.length);
         renderParcelas(parcelas, parcelasContainer);
 
+        if (parcelasContainer && !parcelasContainer.dataset.detailsBound) {
+            parcelasContainer.dataset.detailsBound = '1';
+            parcelasContainer.addEventListener('click', (e) => {
+                const btn = e.target?.closest?.('[data-parcela-id]');
+                if (!btn) return;
+                const parcelaId = btn.getAttribute('data-parcela-id');
+                document.querySelector('.tab[data-tab="visualizacao"]')?.click();
+                window.cocoRootFarmVisualizationShow?.(parcelas, parcelaId);
+            });
+        }
+
         const hasServerTasks = serverTarefas.length > 0;
         let tarefas = hasServerTasks ? serverTarefas : [];
 
