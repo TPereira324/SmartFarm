@@ -125,9 +125,18 @@
         if (stepMeta) stepMeta.textContent = `Passo ${clamped} de ${max}`;
         if (progressBar) progressBar.style.width = `${(clamped / max) * 100}%`;
 
-        if (btnPrev) btnPrev.hidden = clamped === 1;
-        if (btnNext) btnNext.hidden = clamped === max;
-        if (btnSave) btnSave.hidden = clamped !== max;
+        if (btnPrev) {
+            btnPrev.hidden = clamped === 1;
+            btnPrev.style.display = clamped === 1 ? 'none' : '';
+        }
+        if (btnNext) {
+            btnNext.hidden = clamped === max;
+            btnNext.style.display = clamped === max ? 'none' : '';
+        }
+        if (btnSave) {
+            btnSave.hidden = clamped !== max;
+            btnSave.style.display = clamped === max ? '' : 'none';
+        }
 
         if (clamped === max) renderSummary();
         setError('');
